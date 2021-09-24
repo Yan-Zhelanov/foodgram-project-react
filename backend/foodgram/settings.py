@@ -1,5 +1,6 @@
 from os import environ
 from pathlib import Path
+from datetime import timedelta
 
 from dotenv import load_dotenv
 
@@ -20,6 +21,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'djoser',
     'users',
 ]
 
@@ -84,6 +87,17 @@ AUTH_PASSWORD_VALIDATORS = [
                 'NumericPasswordValidator',
     },
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
+    'AUTH_HEADER_TYPES': ('Bearer', 'JWT', 'Token',),
+}
 
 LANGUAGE_CODE = 'en-us'
 
