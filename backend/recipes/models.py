@@ -1,12 +1,15 @@
 from django.db.models import (
-    Model,
-    ManyToManyField,
-    ImageField,
+    CASCADE,
     CharField,
-    TextField,
     ForeignKey,
+    IntegerField,
+    ImageField,
+    ManyToManyField,
+    Model,
+    TextField,
     TimeField,
     SlugField,
+    SET_NULL,
 )
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -30,6 +33,11 @@ class Tag(Model):
         return reverse('tag', args=[self.slug])
 
 
+class Ingredient(Model):
+    name = CharField('Название', max_length=200)
+    measurement_unit = CharField('Единица измерения', max_length=200)
+
+
 class Recipe(Model):
     name = CharField('Название', max_length=200)
     text = TextField('Описание')
@@ -39,7 +47,9 @@ class Recipe(Model):
     cooking_time = TimeField('Время приготовления')
     author = ForeignKey(
         User,
-        verbose_name='Автор'
+        on_delete=SET_NULL,
+        null=True,
+        verbose_name='Автор',
     )
 
     class Meta:
@@ -47,7 +57,49 @@ class Recipe(Model):
         verbose_name_plural = 'Рецепты'
 
     def __str__(self):
-        return f'{self.author.username}: {self.name}'
+        return f'{self.author}: {self.name}'
 
     def get_absoulute_url(self):
         return reverse('recepi', args=[self.pk])
+
+
+class CountOfIngredient(Model):
+    ingredient = ManyToManyField(
+        Ingredient,
+        verbose_name='Ингредиент',
+    )
+    recipe = ForeignKey(
+        Recipe,
+        on_delete=CASCADE,
+        verbose_name='Рецепт',
+    )
+    amount = IntegerField('Количество')
+
+    class Meta:
+        verbose_name = 'Количество ингредиента'
+        verbose_name_plural = 'Количество ингредиентов'
+
+    def __str__(self):
+        return f'{self.recipe}.{self.ingredient}'
+
+
+class Favorite(Model):
+    user = ForeignKey(
+        User,
+        on_delete=CASCADE,
+        related_name='favorites',
+        verbose_name='Пользователь',
+    )
+    recipe = ForeignKey(
+        Recipe,
+        on_delete=CASCADE,
+        related_name='favorites',
+        verbose_name='Рецепт',
+    )
+
+    class Meta:
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранное'
+
+    def __str__(self):
+        return f'{self.user} -> {self.recipe}'
