@@ -7,6 +7,9 @@ from django.db.models import (
     ForeignKey,
     Model,
 )
+from django.db.models.fields.related import ManyToManyField
+
+from recipes.models import Recipe
 
 from .managers import UserManager
 
@@ -53,3 +56,22 @@ class Subscribe(Model):
 
     def __str__(self):
         return f'{self.user} -> {self.author}'
+
+
+class ShoppingCart(Model):
+    user = ForeignKey(
+        User,
+        on_delete=CASCADE,
+        verbose_name='Пользователь',
+    )
+    recipes = ManyToManyField(
+        Recipe,
+        verbose_name='Рецепты',
+    )
+
+    class Meta:
+        verbose_name = 'Список покупок'
+        verbose_name_plural = 'Списки покупок'
+
+    def __str__(self):
+        return f'{self.user}'
