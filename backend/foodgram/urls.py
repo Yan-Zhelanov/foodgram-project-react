@@ -2,8 +2,6 @@ from django.contrib import admin
 from django.urls import path
 from django.urls.conf import include
 
-import debug_toolbar
-
 from foodgram.settings import DEBUG
 
 urlpatterns = [
@@ -12,6 +10,7 @@ urlpatterns = [
 ]
 
 if DEBUG:
+    import debug_toolbar
     urlpatterns += [
         path('__debug__/', include(debug_toolbar.urls), name='debug_toolbar')
     ]

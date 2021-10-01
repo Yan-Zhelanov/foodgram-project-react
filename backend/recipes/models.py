@@ -37,6 +37,9 @@ class Ingredient(Model):
     name = CharField('Название', max_length=200)
     measurement_unit = CharField('Единица измерения', max_length=200)
 
+    def __str__(self):
+        return f'{self.name}'
+
 
 class Recipe(Model):
     name = CharField('Название', max_length=200)
