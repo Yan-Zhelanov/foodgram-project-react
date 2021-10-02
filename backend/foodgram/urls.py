@@ -5,8 +5,8 @@ from django.urls.conf import include
 from foodgram.settings import DEBUG
 
 urlpatterns = [
-    path('admin/', admin.site.urls, name='admin'),
-    path('api/', include('api.urls'), name='api'),
+    path('admin/', admin.site.urls),
+    path('api/', include('api.urls')),
 ]
 
 if DEBUG:
