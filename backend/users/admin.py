@@ -15,7 +15,7 @@ class UserAdmin(UserAdmin):
         'is_superuser',
     )
     list_filter = (
-        'is_blocked', 'is_superuser',
+        'email', 'username', 'is_blocked', 'is_superuser',
     )
     fieldsets = (
         (None, {'fields': (

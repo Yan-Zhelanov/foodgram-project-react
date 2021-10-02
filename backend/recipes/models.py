@@ -37,6 +37,10 @@ class Ingredient(Model):
     name = CharField('Название', max_length=200)
     measurement_unit = CharField('Единица измерения', max_length=200)
 
+    class Meta:
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
+
     def __str__(self):
         return f'{self.name}'
 
@@ -69,12 +73,13 @@ class Recipe(Model):
         return f'{self.author}: {self.name}'
 
     def get_absoulute_url(self):
-        return reverse('recepi', args=[self.pk])
+        return reverse('recipe', args=[self.pk])
 
 
 class CountOfIngredient(Model):
-    ingredient = ManyToManyField(
+    ingredient = ForeignKey(
         Ingredient,
+        on_delete=CASCADE,
         verbose_name='Ингредиент',
     )
     recipe = ForeignKey(
