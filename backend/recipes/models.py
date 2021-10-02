@@ -45,13 +45,16 @@ class Recipe(Model):
     name = CharField('Название', max_length=200)
     text = TextField('Описание')
     ingredients = ManyToManyField('Ингредиенты')
-    tags = ManyToManyField('Теги')
+    tags = ManyToManyField(
+        Tag,
+        verbose_name='Теги'
+    )
     image = ImageField('Картинка')
     cooking_time = TimeField('Время приготовления')
     author = ForeignKey(
         User,
-        on_delete=SET_NULL,
-        null=True,
+        on_delete=CASCADE,
+        # null=True,
         verbose_name='Автор',
     )
 
@@ -106,3 +109,22 @@ class Favorite(Model):
 
     def __str__(self):
         return f'{self.user} -> {self.recipe}'
+
+
+class ShoppingCart(Model):
+    user = ForeignKey(
+        User,
+        on_delete=CASCADE,
+        verbose_name='Пользователь',
+    )
+    recipes = ManyToManyField(
+        Recipe,
+        verbose_name='Рецепты',
+    )
+
+    class Meta:
+        verbose_name = 'Список покупок'
+        verbose_name_plural = 'Списки покупок'
+
+    def __str__(self):
+        return f'{self.user}'
