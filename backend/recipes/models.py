@@ -44,7 +44,10 @@ class Ingredient(Model):
 class Recipe(Model):
     name = CharField('Название', max_length=200)
     text = TextField('Описание')
-    ingredients = ManyToManyField('Ингредиенты')
+    ingredients = ManyToManyField(
+        Ingredient,
+        verbose_name='Ингредиенты'
+    )
     tags = ManyToManyField(
         Tag,
         verbose_name='Теги'
@@ -53,8 +56,8 @@ class Recipe(Model):
     cooking_time = TimeField('Время приготовления')
     author = ForeignKey(
         User,
-        on_delete=CASCADE,
-        # null=True,
+        on_delete=SET_NULL,
+        null=True,
         verbose_name='Автор',
     )
 
