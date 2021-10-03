@@ -1,12 +1,14 @@
-from rest_framework.generics import GenericAPIView
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
-from .models import Recipe
-from .serializers import RecipeSerializer
+from .models import Recipe, Tag
+from .serializers import RecipeSerializer, TagSerializer
 
 
-class TagAPIView(GenericAPIView):
-    pass
+class TagViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
+    serializer_class = TagSerializer
+    queryset = Tag.objects.all()
+    http_method_names = ('get',)
 
 
 class RecipeViewSet(ModelViewSet):
