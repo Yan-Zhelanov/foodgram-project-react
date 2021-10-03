@@ -123,6 +123,7 @@ class ShoppingCart(Model):
     user = ForeignKey(
         User,
         on_delete=CASCADE,
+        related_name='shopping_cart',
         verbose_name='Пользователь',
     )
     recipes = ManyToManyField(

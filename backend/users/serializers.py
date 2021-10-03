@@ -14,6 +14,7 @@ class UserSerializer(ModelSerializer):
         )
         read_only_fields = ('is_subscribed',)
 
+    # TODO: Перенести бизнес-логику в services.py
     def is_subscribed_user(self, obj):
         return len(
             obj.subscribing.filter(user=self.context['request'].user)
