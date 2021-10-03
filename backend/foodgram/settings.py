@@ -100,6 +100,13 @@ REST_FRAMEWORK = {
     ),
 }
 
+DJOSER = {
+    'SERIALIZERS': {
+        'user': 'users.serializers.UserSerializer',
+        'current_user': 'users.serializers.UserSerializer',
+    },
+}
+
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'

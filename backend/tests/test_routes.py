@@ -8,7 +8,7 @@ def test_correct_routes():
         [reverse('api:recipes:recipes'), '/api/recipes/'],
         [reverse('api:recipes:tags'), '/api/tags/'],
     ]
-    for route in routes:
-        assert route[0] == route[1], (
+    for route, expected_route in routes:
+        assert route == expected_route, (
             'Неправильно настроен reverse'
         )

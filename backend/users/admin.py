@@ -1,8 +1,10 @@
-from django.contrib.admin import register
+from django.contrib.admin import ModelAdmin, register
 from django.contrib.auth.admin import UserAdmin
 
+from foodgram.constants import EMPTY
+
 from .forms import CustomUserChangeForm, CustomUserCreationForm
-from .models import User
+from .models import Subscribe, User
 
 
 @register(User)
@@ -27,10 +29,20 @@ class UserAdmin(UserAdmin):
         (None, {
             'classes': ('wide',),
             'fields': (
-                'email', 'username', 'first_name', 'last_name', 'password1', 'password2', 'is_blocked',
-                'is_superuser',
+                'email', 'username', 'first_name', 'last_name', 'password1',
+                'password2', 'is_blocked', 'is_superuser',
             )
         }),
     )
     search_fields = ('email', 'username', 'first_name', 'last_name',)
     ordering = ('id', 'email', 'username',)
+
+
+@register(Subscribe)
+class SubscribeAdmin(ModelAdmin):
+    list_display = ('user', 'author',)
+    empty_value_display = EMPTY
+
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
