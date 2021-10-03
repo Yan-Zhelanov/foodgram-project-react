@@ -1,18 +1,18 @@
+from django.contrib.auth import get_user_model
 from django.db.models import (
     CASCADE,
+    SET_NULL,
     CharField,
     ForeignKey,
-    IntegerField,
     ImageField,
+    IntegerField,
     ManyToManyField,
     Model,
+    SlugField,
     TextField,
     TimeField,
-    SlugField,
-    SET_NULL,
 )
 from django.urls import reverse
-from django.contrib.auth import get_user_model
 
 User = get_user_model()
 

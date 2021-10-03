@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db.models import (
-    BooleanField,
     CASCADE,
+    BooleanField,
     CharField,
     EmailField,
     ForeignKey,
