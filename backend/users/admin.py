@@ -1,10 +1,10 @@
-from django.contrib.admin import ModelAdmin, register
+from django.contrib.admin import ModelAdmin, register, display
 from django.contrib.auth.admin import UserAdmin
 
 from foodgram.constants import EMPTY
 
 from .forms import CustomUserChangeForm, CustomUserCreationForm
-from .models import Subscribe, User
+from .models import Subscribe, User, ShoppingCart
 
 
 @register(User)
@@ -46,3 +46,21 @@ class SubscribeAdmin(ModelAdmin):
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
+
+
+@register(ShoppingCart)
+class ShoppingCartAdmin(ModelAdmin):
+    list_display = ('user', 'count_ingredients')
+    empty_value_display = EMPTY
+
+    class Meta:
+        verbose_name = 'Список покупок'
+        verbose_name_plural = 'Списки покупок'
+
+    # TODO: починить prefetch_related
+    @display(description='Количество ингредиентов')
+    def count_ingredients(self, obj):
+        return sum(
+            recipe.ingredients.count()
+            for recipe in obj.recipes.prefetch_related('ingredients')
+        )

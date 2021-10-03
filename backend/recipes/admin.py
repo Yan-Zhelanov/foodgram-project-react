@@ -7,7 +7,6 @@ from .models import (
     Favorite,
     Ingredient,
     Recipe,
-    ShoppingCart,
     Tag,
 )
 

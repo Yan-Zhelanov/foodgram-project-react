@@ -5,6 +5,7 @@ from django.db.models import (
     CharField,
     EmailField,
     ForeignKey,
+    ManyToManyField,
     Model,
 )
 
@@ -57,3 +58,24 @@ class Subscribe(Model):
 
     def __str__(self):
         return f'{self.user} -> {self.author}'
+
+
+class ShoppingCart(Model):
+    user = ForeignKey(
+        User,
+        on_delete=CASCADE,
+        related_name='shopping_cart',
+        verbose_name='Пользователь',
+    )
+    recipes = ManyToManyField(
+        'recipes.Recipe',
+        related_name='in_shopping_cart',
+        verbose_name='Рецепты',
+    )
+
+    class Meta:
+        verbose_name = 'Список покупок'
+        verbose_name_plural = 'Списки покупок'
+
+    def __str__(self):
+        return f'{self.user}'
