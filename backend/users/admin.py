@@ -1,10 +1,10 @@
-from django.contrib.admin import ModelAdmin, register, display
+from django.contrib.admin import ModelAdmin, display, register
 from django.contrib.auth.admin import UserAdmin
 
 from foodgram.constants import EMPTY
 
 from .forms import CustomUserChangeForm, CustomUserCreationForm
-from .models import Subscribe, User, ShoppingCart
+from .models import ShoppingCart, Subscribe, User
 
 
 @register(User)

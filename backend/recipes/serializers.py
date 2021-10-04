@@ -21,21 +21,17 @@ class RecipeSerializer(ModelSerializer):
     tags = TagSerializer(many=True)
     author = UserSerializer()
     ingredients = IngredientSerializer(many=True)
-    is_favorited = SerializerMethodField(
-        method_name='get_is_favorite',
-    )
-    is_in_shopping_cart = SerializerMethodField(
-        method_name='get_is_in_shopping_cart',
-    )
+    is_favorited = SerializerMethodField()
+    is_in_shopping_cart = SerializerMethodField()
 
     class Meta:
         model = Recipe
         fields = (
-            'id', 'tags', 'author', 'ingredients', 'is_favorited',
-            'is_in_shopping_cart',
+            'id', 'name', 'tags', 'author', 'ingredients', 'is_favorited',
+            'is_in_shopping_cart', 'image', 'text', 'cooking_time',
         )
 
-    def get_is_favorite(self, obj):
+    def get_is_favorited(self, obj):
         return len(
             self.context['request'].user.favorites.filter(recipe=obj)
         ) == 1
@@ -43,5 +39,5 @@ class RecipeSerializer(ModelSerializer):
     def get_is_in_shopping_cart(self, obj):
         return len(
             self.context['request'].user.shopping_cart
-                .filter(recipes__in=[obj])
+                .filter(recipes__in=(obj,))
         ) == 1
