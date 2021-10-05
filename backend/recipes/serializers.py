@@ -1,5 +1,4 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
-
 from users.serializers import UserSerializer
 
 from .models import Ingredient, Recipe, Tag
@@ -31,6 +30,7 @@ class RecipeSerializer(ModelSerializer):
             'is_in_shopping_cart', 'image', 'text', 'cooking_time',
         )
 
+    # TODO: переделать на exists
     def get_is_favorited(self, obj):
         return len(
             self.context['request'].user.favorites.filter(recipe=obj)

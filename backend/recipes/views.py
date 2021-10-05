@@ -1,8 +1,7 @@
 from django_filters.rest_framework.backends import DjangoFilterBackend
+from foodgram.pagination import MyPageNumberPagination
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
-
-from foodgram.pagination import MyPageNumberPagination
 
 from .filters import RecipeFilter
 from .models import Recipe, Tag

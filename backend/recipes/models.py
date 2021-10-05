@@ -1,17 +1,7 @@
 from django.contrib.auth import get_user_model
-from django.db.models import (
-    CASCADE,
-    SET_NULL,
-    CharField,
-    ForeignKey,
-    ImageField,
-    IntegerField,
-    ManyToManyField,
-    Model,
-    SlugField,
-    TextField,
-    TimeField,
-)
+from django.db.models import (CASCADE, SET_NULL, CharField, ForeignKey,
+                              ImageField, IntegerField, ManyToManyField, Model,
+                              SlugField, TextField, TimeField)
 from django.urls import reverse
 
 User = get_user_model()
