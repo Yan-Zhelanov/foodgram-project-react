@@ -7,6 +7,7 @@ from django.db.models import (
     ForeignKey,
     ManyToManyField,
     Model,
+    OneToOneField,
 )
 
 from .managers import UserManager
@@ -61,7 +62,7 @@ class Subscribe(Model):
 
 
 class ShoppingCart(Model):
-    user = ForeignKey(
+    user = OneToOneField(
         User,
         on_delete=CASCADE,
         related_name='shopping_cart',

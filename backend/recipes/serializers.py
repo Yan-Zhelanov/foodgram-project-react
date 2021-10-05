@@ -38,6 +38,6 @@ class RecipeSerializer(ModelSerializer):
 
     def get_is_in_shopping_cart(self, obj):
         return len(
-            self.context['request'].user.shopping_cart
-                .filter(recipes__in=(obj,))
+            self.context['request'].user.shopping_cart.recipes
+                .filter(pk__in=(obj.pk,))
         ) == 1
