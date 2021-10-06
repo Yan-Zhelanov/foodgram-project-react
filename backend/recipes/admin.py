@@ -37,16 +37,21 @@ class RecipeAdmin(ModelAdmin):
 @register(CountOfIngredient)
 class CountOfIngredientAdmin(ModelAdmin):
     list_display = (
-        'recipe', 'ingredient', 'amount', 'get_measurement_unit'
+        'get_recipe', 'ingredient', 'amount', 'get_measurement_unit'
     )
     readonly_fields = ('get_measurement_unit',)
-    list_filter = ('recipe', 'ingredient',)
-    ordering = ('recipe', 'ingredient',)
+    list_filter = ('ingredient',)
+    ordering = ('ingredient',)
     empty_value_display = EMPTY
 
     @display(description='Единица измерения')
     def get_measurement_unit(self, obj):
         return obj.ingredient.measurement_unit
+
+    @display(description='Рецепт')
+    def get_recipe(self, obj):
+        obj = obj
+        return obj.recipe.first()
 
 
 @register(Favorite)

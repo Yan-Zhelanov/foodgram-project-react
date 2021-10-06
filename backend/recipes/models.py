@@ -48,11 +48,13 @@ class Recipe(Model):
     name = CharField('Название', max_length=200)
     text = TextField('Описание')
     ingredients = ManyToManyField(
-        Ingredient,
+        'CountOfIngredient',
+        related_name='recipe',
         verbose_name='Ингредиенты'
     )
     tags = ManyToManyField(
         Tag,
+        related_name='recipes',
         verbose_name='Теги'
     )
     image = ImageField('Картинка')
@@ -79,12 +81,8 @@ class CountOfIngredient(Model):
     ingredient = ForeignKey(
         Ingredient,
         on_delete=CASCADE,
+        related_name='count_in_recipes',
         verbose_name='Ингредиент',
-    )
-    recipe = ForeignKey(
-        Recipe,
-        on_delete=CASCADE,
-        verbose_name='Рецепт',
     )
     amount = IntegerField('Количество')
 
@@ -93,7 +91,10 @@ class CountOfIngredient(Model):
         verbose_name_plural = 'Количество ингредиентов'
 
     def __str__(self):
-        return f'{self.recipe}.{self.ingredient}'
+        return (
+            f'{self.ingredient.name} - {self.amount}'
+            f' ({self.ingredient.measurement_unit})'
+        )
 
 
 class Favorite(Model):
