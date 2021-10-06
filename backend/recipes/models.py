@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
 from django.db.models import (
     CASCADE,
     SET_NULL,
@@ -6,6 +7,7 @@ from django.db.models import (
     ForeignKey,
     ImageField,
     IntegerField,
+    PositiveIntegerField,
     ManyToManyField,
     Model,
     SlugField,
@@ -58,7 +60,10 @@ class Recipe(Model):
         verbose_name='Теги'
     )
     image = ImageField('Картинка')
-    cooking_time = IntegerField('Время приготовления')
+    cooking_time = PositiveIntegerField(
+        'Время приготовления',
+        validators=(MinValueValidator(1),)
+    )
     author = ForeignKey(
         User,
         on_delete=SET_NULL,
@@ -84,7 +89,7 @@ class CountOfIngredient(Model):
         related_name='count_in_recipes',
         verbose_name='Ингредиент',
     )
-    amount = IntegerField('Количество')
+    amount = PositiveIntegerField('Количество')
 
     class Meta:
         verbose_name = 'Количество ингредиента'
