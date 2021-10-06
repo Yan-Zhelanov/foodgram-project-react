@@ -1,7 +1,8 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
+
 from users.serializers import UserSerializer
 
-from .models import Ingredient, Recipe, Tag
+from .models import Ingredient, Recipe, Tag, CountOfIngredient
 
 
 class TagSerializer(ModelSerializer):
@@ -16,10 +17,31 @@ class IngredientSerializer(ModelSerializer):
         fields = ('id', 'name', 'measurement_unit',)
 
 
+class CountOfIngredientSerializer(ModelSerializer):
+    class Meta:
+        model = CountOfIngredient
+        fields = ('amount')
+
+
+class IngredientCountSerializer(ModelSerializer):
+    amount = SerializerMethodField()
+
+    class Meta:
+        model = Ingredient
+        fields = ('id', 'name', 'measurement_unit', 'amount')
+
+    def get_amount(self, obj):
+        wtf = CountOfIngredient.objects.get(
+            ingredient=obj.pk,
+            recipe=self.context['recipe'],
+        ).amount
+        return wtf
+
+
 class RecipeSerializer(ModelSerializer):
     tags = TagSerializer(many=True)
     author = UserSerializer()
-    ingredients = IngredientSerializer(many=True)
+    ingredients = SerializerMethodField()
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
 
@@ -28,6 +50,12 @@ class RecipeSerializer(ModelSerializer):
         fields = (
             'id', 'name', 'tags', 'author', 'ingredients', 'is_favorited',
             'is_in_shopping_cart', 'image', 'text', 'cooking_time',
+        )
+
+    def get_ingredients(self, obj):
+        return IngredientCountSerializer(
+            instance=obj.ingredients,
+            many=True
         )
 
     # TODO: переделать на exists

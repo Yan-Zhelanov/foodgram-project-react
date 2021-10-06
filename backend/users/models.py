@@ -1,7 +1,14 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-from django.db.models import (CASCADE, BooleanField, CharField, EmailField,
-                              ForeignKey, ManyToManyField, Model,
-                              OneToOneField)
+from django.db.models import (
+    CASCADE,
+    BooleanField,
+    CharField,
+    EmailField,
+    ForeignKey,
+    ManyToManyField,
+    Model,
+    OneToOneField,
+)
 
 from .managers import UserManager
 

@@ -1,7 +1,16 @@
 from django.contrib.auth import get_user_model
-from django.db.models import (CASCADE, SET_NULL, CharField, ForeignKey,
-                              ImageField, IntegerField, ManyToManyField, Model,
-                              SlugField, TextField, TimeField)
+from django.db.models import (
+    CASCADE,
+    SET_NULL,
+    CharField,
+    ForeignKey,
+    ImageField,
+    IntegerField,
+    ManyToManyField,
+    Model,
+    SlugField,
+    TextField,
+)
 from django.urls import reverse
 
 User = get_user_model()
@@ -47,7 +56,7 @@ class Recipe(Model):
         verbose_name='Теги'
     )
     image = ImageField('Картинка')
-    cooking_time = TimeField('Время приготовления')
+    cooking_time = IntegerField('Время приготовления')
     author = ForeignKey(
         User,
         on_delete=SET_NULL,
