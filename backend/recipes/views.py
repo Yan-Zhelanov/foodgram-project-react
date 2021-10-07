@@ -1,12 +1,17 @@
 from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
+from rest_framework.permissions import SAFE_METHODS
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
 from foodgram.pagination import MyPageNumberPagination
 
 from .filters import RecipeFilter
 from .models import Recipe, Tag
-from .serializers import RecipeSerializer, TagSerializer
+from .serializers import (
+    RecipeReadSerializer,
+    RecipeWriteSerializer,
+    TagSerializer,
+)
 
 
 class TagViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
@@ -16,9 +21,13 @@ class TagViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
 
 
 class RecipeViewSet(ModelViewSet):
-    serializer_class = RecipeSerializer
     pagination_class = MyPageNumberPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     queryset = Recipe.objects.all()
     http_method_names = ('get', 'post', 'put', 'delete',)
+
+    def get_serializer_class(self):
+        if self.request.method in SAFE_METHODS:
+            return RecipeReadSerializer
+        return RecipeWriteSerializer

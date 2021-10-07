@@ -1,13 +1,17 @@
+from django.shortcuts import get_object_or_404
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework.serializers import (
     CharField,
     IntegerField,
     ModelSerializer,
+    SlugRelatedField,
+    ListField,
     SerializerMethodField,
 )
 
 from users.serializers import UserSerializer
 
-from .models import CountOfIngredient, Ingredient, Recipe, Tag
+from .models import CountOfIngredient, Recipe, Tag, Ingredient
 
 
 class TagSerializer(ModelSerializer):
@@ -16,13 +20,18 @@ class TagSerializer(ModelSerializer):
         fields = ('id', 'name', 'color', 'slug',)
 
 
-class IngredientSerializer(ModelSerializer):
+class RecipeIngredientWriteSerializer(ModelSerializer):
     class Meta:
-        model = Ingredient
-        fields = ('id', 'name', 'measurement_unit',)
+        model = CountOfIngredient
+        fields = ('id', 'amount',)
+        extra_kwargs = {
+            'id': {
+                'read_only': False,
+            },
+        }
 
 
-class RecipeIngredientSerializer(ModelSerializer):
+class RecipeIngredientReadSerializer(ModelSerializer):
     id = IntegerField(source='ingredient.id') # noqa
     name = CharField(source='ingredient.name')
     measurement_unit = CharField(source='ingredient.measurement_unit')
@@ -32,10 +41,10 @@ class RecipeIngredientSerializer(ModelSerializer):
         fields = ('id', 'name', 'measurement_unit', 'amount',)
 
 
-class RecipeSerializer(ModelSerializer):
+class RecipeReadSerializer(ModelSerializer):
     tags = TagSerializer(many=True)
     author = UserSerializer()
-    ingredients = RecipeIngredientSerializer(many=True)
+    ingredients = RecipeIngredientReadSerializer(many=True)
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
 
@@ -57,3 +66,35 @@ class RecipeSerializer(ModelSerializer):
             self.context['request'].user.shopping_cart.recipes
                 .filter(pk__in=(obj.pk,))
         ) == 1
+
+
+class RecipeWriteSerializer(ModelSerializer):
+    ingredients = RecipeIngredientWriteSerializer(many=True)
+    tags = ListField(
+        child=SlugRelatedField(
+            slug_field='id',
+            queryset=Tag.objects.all()
+        )
+    )
+    image = Base64ImageField()
+
+    class Meta:
+        model = Recipe
+        fields = (
+            'ingredients',
+            'tags', 'image', 'name', 'text', 'cooking_time',
+        )
+
+    def create(self, validated_data):
+        ingredients_data = validated_data.pop('ingredients')
+        tags = validated_data.pop('tags', [])
+        recipe = Recipe.objects.create(**validated_data)
+        for ingredient in ingredients_data:
+            count_of_ingredient = CountOfIngredient.objects.create(
+                ingredient=get_object_or_404(Ingredient, pk=ingredient['id']),
+                amount=ingredient['amount'],
+            )
+            recipe.ingredients.add(count_of_ingredient)
+        for tag in tags:
+            recipe.tags.add(tag)
+        return RecipeReadSerializer(instance=recipe).data

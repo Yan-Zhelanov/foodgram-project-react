@@ -6,10 +6,9 @@ from django.db.models import (
     CharField,
     ForeignKey,
     ImageField,
-    IntegerField,
-    PositiveIntegerField,
     ManyToManyField,
     Model,
+    PositiveIntegerField,
     SlugField,
     TextField,
 )
