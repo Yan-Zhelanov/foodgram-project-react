@@ -3,15 +3,15 @@ from drf_extra_fields.fields import Base64ImageField
 from rest_framework.serializers import (
     CharField,
     IntegerField,
-    ModelSerializer,
-    SlugRelatedField,
     ListField,
+    ModelSerializer,
     SerializerMethodField,
+    SlugRelatedField,
 )
 
 from users.serializers import UserSerializer
 
-from .models import CountOfIngredient, Recipe, Tag, Ingredient
+from .models import CountOfIngredient, Ingredient, Recipe, Tag
 
 
 class TagSerializer(ModelSerializer):
@@ -74,15 +74,14 @@ class RecipeWriteSerializer(ModelSerializer):
         child=SlugRelatedField(
             slug_field='id',
             queryset=Tag.objects.all()
-        )
+        ),
     )
     image = Base64ImageField()
 
     class Meta:
         model = Recipe
         fields = (
-            'ingredients',
-            'tags', 'image', 'name', 'text', 'cooking_time',
+            'ingredients', 'tags', 'image', 'name', 'text', 'cooking_time',
         )
 
     def create(self, validated_data):
@@ -97,4 +96,4 @@ class RecipeWriteSerializer(ModelSerializer):
             recipe.ingredients.add(count_of_ingredient)
         for tag in tags:
             recipe.tags.add(tag)
-        return RecipeReadSerializer(instance=recipe).data
+        return recipe
