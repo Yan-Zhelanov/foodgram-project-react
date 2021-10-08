@@ -20,6 +20,12 @@ class TagSerializer(ModelSerializer):
         fields = ('id', 'name', 'color', 'slug',)
 
 
+class IngredientSerializer(ModelSerializer):
+    class Meta:
+        model = Ingredient
+        fields = ('id', 'name', 'measurement_unit',)
+
+
 class RecipeIngredientWriteSerializer(ModelSerializer):
     class Meta:
         model = CountOfIngredient

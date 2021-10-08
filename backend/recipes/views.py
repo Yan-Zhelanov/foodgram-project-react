@@ -9,17 +9,28 @@ from foodgram.pagination import MyPageNumberPagination
 from foodgram.permissions import IsAuthorOrAdminOrReadOnly
 
 from .filters import RecipeFilter
-from .models import Recipe, Tag
+from .models import Ingredient, Recipe, Tag
 from .serializers import (
     RecipeReadSerializer,
     RecipeWriteSerializer,
     TagSerializer,
+    IngredientSerializer,
 )
 
 
-class TagViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
+class ListRetriveViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
+    pass
+
+
+class TagViewSet(ListRetriveViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
+    http_method_names = ('get',)
+
+
+class IngredientViewSet(ListRetriveViewSet):
+    serializer_class = IngredientSerializer
+    queryset = Ingredient.objects.all()
     http_method_names = ('get',)
 
 
