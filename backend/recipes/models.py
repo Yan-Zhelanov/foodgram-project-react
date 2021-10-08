@@ -75,7 +75,7 @@ class Recipe(Model):
         verbose_name_plural = 'Рецепты'
 
     def __str__(self):
-        return f'{self.author}: {self.name}'
+        return f'{self.name} ({self.author})'
 
     def get_absoulute_url(self):
         return reverse('recipe', args=[self.pk])

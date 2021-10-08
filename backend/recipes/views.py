@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED
 
 from foodgram.pagination import MyPageNumberPagination
+from foodgram.permissions import IsAuthorOrAdminOrReadOnly
 
 from .filters import RecipeFilter
 from .models import Recipe, Tag
@@ -24,6 +25,7 @@ class TagViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
 
 class RecipeViewSet(ModelViewSet):
     pagination_class = MyPageNumberPagination
+    permission_classes = (IsAuthorOrAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     queryset = Recipe.objects.all()

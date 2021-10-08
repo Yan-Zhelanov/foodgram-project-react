@@ -16,6 +16,8 @@ class UserSerializer(ModelSerializer):
 
     # TODO: Перенести бизнес-логику в services.py
     def is_subscribed_user(self, obj):
-        return len(
-            obj.subscribing.filter(user=self.context['request'].user)
-        ) == 1
+        user = self.context['request'].user
+        return (
+            user.is_authenticated
+            and obj.subscribing.filter(user=user).exists()
+        )

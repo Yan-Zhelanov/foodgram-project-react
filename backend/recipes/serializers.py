@@ -55,17 +55,22 @@ class RecipeReadSerializer(ModelSerializer):
             'is_in_shopping_cart', 'image', 'text', 'cooking_time',
         )
 
-    # TODO: переделать на exists
+    def get_user(self):
+        return self.context['request'].user
+
     def get_is_favorited(self, obj):
-        return len(
-            self.context['request'].user.favorites.filter(recipe=obj)
-        ) == 1
+        user = self.get_user()
+        return (
+            user.is_authenticated
+            and user.favorites.filter(recipe=obj).exists()
+        )
 
     def get_is_in_shopping_cart(self, obj):
-        return len(
-            self.context['request'].user.shopping_cart.recipes
-                .filter(pk__in=(obj.pk,))
-        ) == 1
+        user = self.get_user()
+        return (
+            user.is_authenticated
+            and user.shopping_cart.recipes.filter(pk__in=(obj.pk,)).exists()
+        )
 
 
 class RecipeWriteSerializer(ModelSerializer):
