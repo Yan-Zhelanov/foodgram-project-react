@@ -119,6 +119,7 @@ class Favorite(Model):
     class Meta:
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
+        unique_together = ('user', 'recipe',)
 
     def __str__(self):
         return f'{self.user} -> {self.recipe}'

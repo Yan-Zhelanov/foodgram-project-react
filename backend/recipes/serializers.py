@@ -124,3 +124,9 @@ class RecipeWriteSerializer(ModelSerializer):
         for tag in tags:
             instance.tags.add(tag)
         return instance
+
+
+class RecipeShortReadSerializer(ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time',)

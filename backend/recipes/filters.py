@@ -1,5 +1,4 @@
-from django.db.models import Value
-from django.db.models import IntegerField
+from django.db.models import IntegerField, Value
 from django_filters.rest_framework import FilterSet
 from django_filters.rest_framework.filters import BooleanFilter, CharFilter
 
