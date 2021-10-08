@@ -3,7 +3,7 @@ from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.permissions import SAFE_METHODS
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.response import Response
-from rest_framework.status import HTTP_201_CREATED
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED
 
 from foodgram.pagination import MyPageNumberPagination
 from foodgram.permissions import IsAuthorOrAdminOrReadOnly
@@ -50,4 +50,23 @@ class RecipeViewSet(ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(
             serializer.data, status=HTTP_201_CREATED, headers=headers
+        )
+
+    def perform_update(self, serializer):
+        return serializer.save()
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=partial
+        )
+        serializer.is_valid(raise_exception=True)
+        saved = self.perform_update(serializer)
+        serializer = RecipeReadSerializer(
+            instance=saved,
+            context={'request': self.request}
+        )
+        return Response(
+            serializer.data, status=HTTP_200_OK
         )

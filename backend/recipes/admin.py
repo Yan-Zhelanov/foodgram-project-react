@@ -7,7 +7,7 @@ from .models import CountOfIngredient, Favorite, Ingredient, Recipe, Tag
 
 @register(Tag)
 class TagAdmin(ModelAdmin):
-    list_display = ('name', 'slug', 'color',)
+    list_display = ('id', 'name', 'slug', 'color',)
     search_fields = ('name', 'slug',)
     ordering = ('color',)
     empty_value_display = EMPTY
@@ -37,7 +37,8 @@ class RecipeAdmin(ModelAdmin):
 @register(CountOfIngredient)
 class CountOfIngredientAdmin(ModelAdmin):
     list_display = (
-        'get_recipe', 'ingredient', 'amount', 'get_measurement_unit'
+        'id', 'ingredient', 'amount', 'get_measurement_unit',
+        'get_recipes_count',
     )
     readonly_fields = ('get_measurement_unit',)
     list_filter = ('ingredient',)
@@ -48,10 +49,9 @@ class CountOfIngredientAdmin(ModelAdmin):
     def get_measurement_unit(self, obj):
         return obj.ingredient.measurement_unit
 
-    @display(description='Рецепт')
-    def get_recipe(self, obj):
-        obj = obj
-        return obj.recipe.first()
+    @display(description='Количество ссылок в рецептах')
+    def get_recipes_count(self, obj):
+        return obj.recipe.count()
 
 
 @register(Favorite)
