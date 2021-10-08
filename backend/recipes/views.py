@@ -8,7 +8,7 @@ from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED
 from foodgram.pagination import MyPageNumberPagination
 from foodgram.permissions import IsAuthorOrAdminOrReadOnly
 
-from .filters import RecipeFilter
+from .filters import RecipeFilter, IngredientSearchFilter
 from .models import Ingredient, Recipe, Tag
 from .serializers import (
     RecipeReadSerializer,
@@ -30,6 +30,8 @@ class TagViewSet(ListRetriveViewSet):
 
 class IngredientViewSet(ListRetriveViewSet):
     serializer_class = IngredientSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = IngredientSearchFilter
     queryset = Ingredient.objects.all()
     http_method_names = ('get',)
 
