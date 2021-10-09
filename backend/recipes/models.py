@@ -67,6 +67,7 @@ class Recipe(Model):
         User,
         on_delete=SET_NULL,
         null=True,
+        related_name='recipes',
         verbose_name='Автор',
     )
 

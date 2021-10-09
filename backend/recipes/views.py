@@ -16,7 +16,7 @@ from rest_framework.status import (
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
-from foodgram.pagination import MyPageNumberPagination
+from foodgram.pagination import LimitPageNumberPagination
 from foodgram.permissions import IsAuthorOrAdminOrReadOnly
 
 from .filters import IngredientSearchFilter, RecipeFilter
@@ -49,7 +49,7 @@ class IngredientViewSet(ListRetriveViewSet):
 
 
 class RecipeViewSet(ModelViewSet):
-    pagination_class = MyPageNumberPagination
+    pagination_class = LimitPageNumberPagination
     permission_classes = (IsAuthorOrAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter

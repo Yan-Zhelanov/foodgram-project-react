@@ -1,15 +1,15 @@
 from django.urls import include, path
 
-from .views import SubscribeAPIView
+from rest_framework.routers import DefaultRouter
+
+from .views import UserSubscribeViewSet
+
+router = DefaultRouter()
+router.register(r'users', UserSubscribeViewSet, basename='users')
 
 app_name = 'users'
 
 urlpatterns = [
-    path(
-        'users/subscriptions/',
-        SubscribeAPIView.as_view(),
-        name='subscriptions'
-    ),
     path(
         'auth/',
         include(
@@ -17,5 +17,5 @@ urlpatterns = [
             namespace='auth'
         )
     ),
-    path('', include('djoser.urls')),
+    path('', include(router.urls)),
 ]

@@ -21,3 +21,15 @@ class UserSerializer(ModelSerializer):
             user.is_authenticated
             and obj.subscribing.filter(user=user).exists()
         )
+
+
+class SubscriptionSerializer(UserSerializer):
+    from recipes.serializers import RecipeShortReadSerializer
+    recipes = RecipeShortReadSerializer(many=True)
+    recipes_count = SerializerMethodField()
+
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + ('recipes', 'recipes_count',)
+
+    def get_recipes_count(self, obj):
+        return obj.recipes.count()
