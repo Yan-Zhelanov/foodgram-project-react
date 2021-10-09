@@ -12,7 +12,6 @@ class UserSerializer(ModelSerializer):
             'id', 'email', 'username', 'first_name', 'last_name',
             'is_subscribed'
         )
-        read_only_fields = ('is_subscribed',)
 
     # TODO: Перенести бизнес-логику в services.py
     def is_subscribed_user(self, obj):
