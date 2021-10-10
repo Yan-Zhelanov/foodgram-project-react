@@ -1,3 +1,5 @@
+from django.contrib.auth.hashers import make_password
+
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from .models import User
@@ -9,9 +11,12 @@ class UserSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'id', 'email', 'username', 'first_name', 'last_name',
-            'is_subscribed'
+            'id', 'email', 'username', 'first_name', 'last_name', 'password',
+            'is_subscribed',
         )
+        extra_kwargs = {
+            'password': {'write_only': True, 'required': True},
+        }
 
     # TODO: Перенести бизнес-логику в services.py
     def is_subscribed_user(self, obj):
@@ -20,6 +25,12 @@ class UserSerializer(ModelSerializer):
             user.is_authenticated
             and obj.subscribing.filter(user=user).exists()
         )
+
+    def create(self, validated_data):
+        validated_data['password'] = (
+            make_password(validated_data.pop('password'))
+        )
+        return super().create(validated_data)
 
 
 class SubscriptionSerializer(UserSerializer):
