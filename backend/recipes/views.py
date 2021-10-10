@@ -10,8 +10,8 @@ from rest_framework.status import (
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
 )
-from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from rest_framework.decorators import action
 
 from foodgram.pagination import LimitPageNumberPagination
 from foodgram.permissions import IsAuthorOrAdminOrReadOnly
@@ -94,15 +94,10 @@ class RecipeViewSet(ModelViewSet):
         )
 
 
-class FavoriteAPIView(APIView):
+class FavoriteViewSet(GenericViewSet):
     permission_classes = (IsAuthenticated,)
-    http_method_names = ('get', 'delete',)
 
-    def get_recipe(self):
-        return get_object_or_404(Recipe, pk=self.kwargs['id'])
-
-    def get(self, request, *args, **kwargs):
-        recipe = self.get_recipe()
+    def add_to_favorite(self, request, recipe):
         try:
             Favorite.objects.create(user=request.user, recipe=recipe)
         except IntegrityError:
@@ -116,8 +111,7 @@ class FavoriteAPIView(APIView):
             status=HTTP_201_CREATED,
         )
 
-    def delete(self, request, *args, **kwargs):
-        recipe = self.get_recipe()
+    def delete_from_favorite(self, request, recipe):
         favorite = Favorite.objects.filter(user=request.user, recipe=recipe)
         if not favorite.exists():
             return Response(
@@ -126,3 +120,10 @@ class FavoriteAPIView(APIView):
             )
         favorite.delete()
         return Response(status=HTTP_204_NO_CONTENT)
+
+    @action(methods=('get', 'delete',), detail=True)
+    def favorite(self, request, pk=None):
+        recipe = get_object_or_404(Recipe, pk=pk)
+        if request.method == 'GET':
+            return self.add_to_favorite(request, recipe)
+        return self.delete_from_favorite(request, recipe)
