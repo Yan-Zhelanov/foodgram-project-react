@@ -1,9 +1,9 @@
-from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
-from django.http import Http404
-
-from rest_framework.permissions import IsAuthenticated
+from django.http import Http404, FileResponse
+from django.shortcuts import get_object_or_404
+from djoser.views import UserViewSet
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
@@ -12,13 +12,19 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_404_NOT_FOUND,
 )
+from rest_framework.viewsets import GenericViewSet
 
-from djoser.views import UserViewSet
-
+from foodgram.settings import MEDIA_ROOT
 from foodgram.pagination import LimitPageNumberPagination
+from recipes.serializers import RecipeShortReadSerializer
 
-from .models import Subscribe, User
+from .models import ShoppingCart, Subscribe, User
 from .serializers import SubscriptionSerializer
+
+MEASUREMENT_UNIT = 0
+AMOUNT = 1
+
+FILE_NAME = 'shopping_cart.txt'
 
 
 class UserSubscribeViewSet(UserViewSet):
@@ -93,3 +99,40 @@ class UserSubscribeViewSet(UserViewSet):
         if request.method == 'GET':
             return self.create_subscribe(request, author)
         return self.delete_subscribe(request, author)
+
+
+class ShoppingCartViewSet(GenericViewSet):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = RecipeShortReadSerializer
+    queryset = ShoppingCart.objects.all()
+    http_method_names = ('get', 'delete',)
+
+    def generate_shopping_cart_data(self, request):
+        recipes = (
+            request.user.shopping_cart.recipes.prefetch_related('ingredients')
+        )
+        ingredients = {}
+        for recipe in recipes:
+            for ingredient in recipe.ingredients.all():
+                if ingredient.pk not in ingredients:
+                    ingredients[ingredient.ingredient.name] = [
+                        ingredient.ingredient.measurement_unit,
+                        ingredient.amount
+                    ]
+                    continue
+                ingredients[ingredient.name][AMOUNT] += ingredient.amount
+        return ingredients
+
+    def generate_file(self, ingredients, file_path):
+        with open(MEDIA_ROOT / FILE_NAME, 'w') as file:
+            for name, data in ingredients.items():
+                file.write(
+                    f'{name} ({data[MEASUREMENT_UNIT]}) — {data[AMOUNT]}\r\n'
+                )
+
+    @action(detail=False)
+    def download_shopping_cart(self, request):
+        ingredients = self.generate_shopping_cart_data(request)
+        file_path = MEDIA_ROOT / FILE_NAME
+        self.generate_file(ingredients, file_path)
+        return FileResponse(open(file_path, 'rb'))

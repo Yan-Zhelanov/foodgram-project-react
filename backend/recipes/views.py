@@ -1,10 +1,7 @@
-from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework.backends import DjangoFilterBackend
-from rest_framework.mixins import (
-    ListModelMixin,
-    RetrieveModelMixin,
-)
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
