@@ -16,7 +16,9 @@ from rest_framework.viewsets import GenericViewSet
 
 from foodgram.settings import MEDIA_ROOT
 from foodgram.pagination import LimitPageNumberPagination
+
 from recipes.serializers import RecipeShortReadSerializer
+from recipes.models import Recipe
 
 from .models import ShoppingCart, Subscribe, User
 from .serializers import SubscriptionSerializer
@@ -124,7 +126,7 @@ class ShoppingCartViewSet(GenericViewSet):
         return ingredients
 
     def generate_file(self, ingredients, file_path):
-        with open(MEDIA_ROOT / FILE_NAME, 'w') as file:
+        with open(MEDIA_ROOT / FILE_NAME, 'w', encoding='utf-8') as file:
             for name, data in ingredients.items():
                 file.write(
                     f'{name} ({data[MEASUREMENT_UNIT]}) — {data[AMOUNT]}\r\n'
@@ -136,3 +138,41 @@ class ShoppingCartViewSet(GenericViewSet):
         file_path = MEDIA_ROOT / FILE_NAME
         self.generate_file(ingredients, file_path)
         return FileResponse(open(file_path, 'rb'))
+
+    def add_to_shopping_cart(self, request, recipe, shopping_cart):
+        if shopping_cart.recipes.filter(pk__in=(recipe.pk,)).exists():
+            return Response(
+                {'errors': 'Рецепт уже добавлен!'},
+                status=HTTP_400_BAD_REQUEST,
+            )
+        shopping_cart.recipes.add(recipe)
+        serializer = self.get_serializer(recipe)
+        return Response(
+            serializer.data,
+            status=HTTP_201_CREATED,
+        )
+
+    def remove_from_shopping_cart(self, request, recipe, shopping_cart):
+        if not shopping_cart.recipes.filter(pk__in=(recipe.pk,)).exists():
+            return Response({
+                    'errors': (
+                        'Нельзя удалить рецепт из списка покупок, которого нет'
+                        ' в списке покупок!'
+                    )
+                },
+                status=HTTP_400_BAD_REQUEST,
+            )
+        shopping_cart.recipes.remove(recipe)
+        return Response(
+            status=HTTP_204_NO_CONTENT,
+        )
+
+    @action(methods=('get', 'delete',), detail=True)
+    def shopping_cart(self, request, pk=None):
+        recipe = get_object_or_404(Recipe, pk=pk)
+        shopping_cart = (
+            ShoppingCart.objects.get_or_create(user=request.user)[0]
+        )
+        if request.method == 'GET':
+            return self.add_to_shopping_cart(request, recipe, shopping_cart)
+        return self.remove_from_shopping_cart(request, recipe, shopping_cart)
