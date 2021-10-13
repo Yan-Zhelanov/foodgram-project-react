@@ -14,7 +14,7 @@ api = [
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(api)),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] # + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if DEBUG:
     import debug_toolbar

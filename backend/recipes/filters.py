@@ -2,6 +2,8 @@ from django.db.models import IntegerField, Value
 from django_filters.rest_framework import FilterSet
 from django_filters.rest_framework.filters import BooleanFilter, CharFilter
 
+from users.models import ShoppingCart
+
 from .models import Ingredient, Recipe
 
 
@@ -48,9 +50,12 @@ class RecipeFilter(FilterSet):
     def get_is_in_shopping_cart(self, queryset, name, value):
         if not value:
             return queryset
-        recipes = (
-            self.request.user.shopping_cart.recipes.all()
-        )
+        try:
+            recipes = (
+                self.request.user.shopping_cart.recipes.all()
+            )
+        except ShoppingCart.DoesNotExist:
+            return queryset
         return queryset.filter(
             pk__in=(recipe.pk for recipe in recipes)
         )

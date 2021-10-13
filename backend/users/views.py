@@ -134,7 +134,13 @@ class ShoppingCartViewSet(GenericViewSet):
 
     @action(detail=False)
     def download_shopping_cart(self, request):
-        ingredients = self.generate_shopping_cart_data(request)
+        try:
+            ingredients = self.generate_shopping_cart_data(request)
+        except ShoppingCart.DoesNotExist:
+            return Response(
+                {'errors': 'Список покупок пуст!'},
+                status=HTTP_400_BAD_REQUEST
+            )
         file_path = MEDIA_ROOT / FILE_NAME
         self.generate_file(ingredients, file_path)
         return FileResponse(open(file_path, 'rb'))

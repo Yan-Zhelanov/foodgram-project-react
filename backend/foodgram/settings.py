@@ -27,7 +27,7 @@ INSTALLED_APPS = [
     'django_filters',
     'debug_toolbar',
     'djoser',
-    'users',
+    'users.apps.UsersConfig',
     'recipes',
 ]
 
@@ -118,10 +118,10 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'static/'
+STATIC_URL = '/static_backend/'
+STATIC_ROOT = BASE_DIR / 'static_backend/'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media/'
+MEDIA_URL = '/media_backend/'
+MEDIA_ROOT = BASE_DIR / 'media_backend/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
