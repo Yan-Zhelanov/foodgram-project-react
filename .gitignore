@@ -1,6 +1,8 @@
 .vscode/
 media/
+media_backend/
 static/
+static_backend/
 
 .isort.cfg
 
