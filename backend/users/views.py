@@ -1,5 +1,5 @@
 from django.db import IntegrityError
-from django.http import Http404, FileResponse
+from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework.decorators import action
@@ -14,11 +14,10 @@ from rest_framework.status import (
 )
 from rest_framework.viewsets import GenericViewSet
 
-from foodgram.settings import MEDIA_ROOT
 from foodgram.pagination import LimitPageNumberPagination
-
-from recipes.serializers import RecipeShortReadSerializer
+from foodgram.settings import MEDIA_ROOT
 from recipes.models import Recipe
+from recipes.serializers import RecipeShortReadSerializer
 
 from .models import ShoppingCart, Subscribe, User
 from .serializers import SubscriptionSerializer
