@@ -14,6 +14,7 @@ from rest_framework.status import (
 )
 from rest_framework.viewsets import GenericViewSet
 
+from foodgram.constants import ERRORS_KEY
 from foodgram.pagination import LimitPageNumberPagination
 from foodgram.settings import MEDIA_ROOT
 from recipes.models import Recipe
@@ -26,6 +27,22 @@ MEASUREMENT_UNIT = 0
 AMOUNT = 1
 
 FILE_NAME = 'shopping_cart.txt'
+
+SUBSCRIBE_CANNOT_CREATE_TO_YOURSELF = 'Нельзя подписаться на самого себя!'
+SUBSCRIBE_CANNOT_CREATE_TWICE = 'Нельзя подписаться дважды!'
+SUBSCRIBE_CANNOT_DELETE = (
+    'Нельзя отписаться от данного пользователя,'
+    ' если вы не подписаны на него!'
+)
+
+USER_NOT_FOUND = 'Пользователь не найден!'
+
+SHOPPING_CART_EMPTY = 'Список покупок пуст!'
+SHOPPING_CART_RECIPE_CANNOT_ADDED_TWICE = 'Рецепт уже добавлен!'
+SHOPPING_CART_RECIPE_CANNOT_DELETE = (
+    'Нельзя удалить рецепт из списка покупок, которого нет'
+    ' в списке покупок!'
+)
 
 
 class UserSubscribeViewSet(UserViewSet):
@@ -52,7 +69,7 @@ class UserSubscribeViewSet(UserViewSet):
     def create_subscribe(self, request, author):
         if request.user == author:
             return Response(
-                {'errors': 'Нельзя подписаться на самого себя!'},
+                {ERRORS_KEY: SUBSCRIBE_CANNOT_CREATE_TO_YOURSELF},
                 status=HTTP_400_BAD_REQUEST,
             )
         try:
@@ -62,7 +79,7 @@ class UserSubscribeViewSet(UserViewSet):
             )
         except IntegrityError:
             return Response(
-                {'errors': 'Нельзя подписаться дважды!'},
+                {ERRORS_KEY: SUBSCRIBE_CANNOT_CREATE_TWICE},
                 status=HTTP_400_BAD_REQUEST,
             )
         serializer = self.get_subscribtion_serializer(subscribe.author)
@@ -72,12 +89,8 @@ class UserSubscribeViewSet(UserViewSet):
         try:
             Subscribe.objects.get(user=request.user, author=author).delete()
         except Subscribe.DoesNotExist:
-            return Response({
-                    'errors': (
-                        'Нельзя отписаться от данного пользователя,'
-                        ' если вы не подписаны на него!'
-                    )
-                },
+            return Response(
+                {ERRORS_KEY: SUBSCRIBE_CANNOT_DELETE},
                 status=HTTP_400_BAD_REQUEST,
             )
         return Response(
@@ -94,7 +107,7 @@ class UserSubscribeViewSet(UserViewSet):
             author = get_object_or_404(User, pk=user_id)
         except Http404:
             return Response(
-                {'detail': 'Пользователь не найден!'},
+                {'detail': USER_NOT_FOUND},
                 status=HTTP_404_NOT_FOUND,
             )
         if request.method == 'GET':
@@ -137,7 +150,7 @@ class ShoppingCartViewSet(GenericViewSet):
             ingredients = self.generate_shopping_cart_data(request)
         except ShoppingCart.DoesNotExist:
             return Response(
-                {'errors': 'Список покупок пуст!'},
+                {ERRORS_KEY: SHOPPING_CART_EMPTY},
                 status=HTTP_400_BAD_REQUEST
             )
         file_path = MEDIA_ROOT / FILE_NAME
@@ -147,7 +160,7 @@ class ShoppingCartViewSet(GenericViewSet):
     def add_to_shopping_cart(self, request, recipe, shopping_cart):
         if shopping_cart.recipes.filter(pk__in=(recipe.pk,)).exists():
             return Response(
-                {'errors': 'Рецепт уже добавлен!'},
+                {ERRORS_KEY: SHOPPING_CART_RECIPE_CANNOT_ADDED_TWICE},
                 status=HTTP_400_BAD_REQUEST,
             )
         shopping_cart.recipes.add(recipe)
@@ -159,12 +172,8 @@ class ShoppingCartViewSet(GenericViewSet):
 
     def remove_from_shopping_cart(self, request, recipe, shopping_cart):
         if not shopping_cart.recipes.filter(pk__in=(recipe.pk,)).exists():
-            return Response({
-                    'errors': (
-                        'Нельзя удалить рецепт из списка покупок, которого нет'
-                        ' в списке покупок!'
-                    )
-                },
+            return Response(
+                {ERRORS_KEY: SHOPPING_CART_RECIPE_CANNOT_DELETE},
                 status=HTTP_400_BAD_REQUEST,
             )
         shopping_cart.recipes.remove(recipe)

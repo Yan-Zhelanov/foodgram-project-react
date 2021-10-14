@@ -17,7 +17,6 @@ class UserSerializer(ModelSerializer):
             'password': {'write_only': True, 'required': True},
         }
 
-    # TODO: Перенести бизнес-логику в services.py
     def is_subscribed_user(self, obj):
         user = self.context['request'].user
         return (

@@ -13,6 +13,7 @@ from rest_framework.status import (
 )
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
+from foodgram.constants import ERRORS_KEY
 from foodgram.pagination import LimitPageNumberPagination
 from foodgram.permissions import IsAuthorOrAdminOrReadOnly
 
@@ -25,6 +26,9 @@ from .serializers import (
     RecipeWriteSerializer,
     TagSerializer
 )
+
+FAVORITE_ALREADY_EXISTS = 'Вы уже подписаны!'
+FAVORITE_DONT_EXIST = 'Подписки не существует!'
 
 
 class ListRetriveViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
@@ -102,7 +106,7 @@ class FavoriteViewSet(GenericViewSet):
             Favorite.objects.create(user=request.user, recipe=recipe)
         except IntegrityError:
             return Response(
-                {'errors': 'Вы уже подписаны!'},
+                {ERRORS_KEY: FAVORITE_ALREADY_EXISTS},
                 status=HTTP_400_BAD_REQUEST,
             )
         serializer = RecipeShortReadSerializer(recipe)
@@ -115,7 +119,7 @@ class FavoriteViewSet(GenericViewSet):
         favorite = Favorite.objects.filter(user=request.user, recipe=recipe)
         if not favorite.exists():
             return Response(
-                {'errors': 'Подписки не существует!'},
+                {ERRORS_KEY: FAVORITE_DONT_EXIST},
                 status=HTTP_400_BAD_REQUEST,
             )
         favorite.delete()

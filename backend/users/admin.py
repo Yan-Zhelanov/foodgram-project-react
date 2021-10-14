@@ -58,7 +58,6 @@ class ShoppingCartAdmin(ModelAdmin):
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Списки покупок'
 
-    # TODO: починить prefetch_related
     @display(description='Количество ингредиентов')
     def count_ingredients(self, obj):
         return sum(
