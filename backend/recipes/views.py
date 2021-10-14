@@ -55,7 +55,7 @@ class RecipeViewSet(ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     queryset = Recipe.objects.all()
-    http_method_names = ('get', 'post', 'put', 'delete',)
+    http_method_names = ('get', 'post', 'put', 'patch', 'delete',)
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
