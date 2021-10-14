@@ -6,7 +6,7 @@ from rest_framework.serializers import (
     ListField,
     ModelSerializer,
     SerializerMethodField,
-    SlugRelatedField,
+    SlugRelatedField
 )
 
 from users.models import ShoppingCart

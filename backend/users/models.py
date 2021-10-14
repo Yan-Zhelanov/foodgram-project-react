@@ -7,7 +7,7 @@ from django.db.models import (
     ForeignKey,
     ManyToManyField,
     Model,
-    OneToOneField,
+    OneToOneField
 )
 
 from .managers import UserManager

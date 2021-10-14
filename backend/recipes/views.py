@@ -9,7 +9,7 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_204_NO_CONTENT,
-    HTTP_400_BAD_REQUEST,
+    HTTP_400_BAD_REQUEST
 )
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
@@ -23,7 +23,7 @@ from .serializers import (
     RecipeReadSerializer,
     RecipeShortReadSerializer,
     RecipeWriteSerializer,
-    TagSerializer,
+    TagSerializer
 )
 
 

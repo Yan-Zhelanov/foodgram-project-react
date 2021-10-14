@@ -10,7 +10,7 @@ from django.db.models import (
     Model,
     PositiveIntegerField,
     SlugField,
-    TextField,
+    TextField
 )
 from django.urls import reverse
 

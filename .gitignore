@@ -4,8 +4,6 @@ media_backend/
 static/
 static_backend/
 
-.isort.cfg
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
