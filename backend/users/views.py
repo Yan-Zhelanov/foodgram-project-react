@@ -24,9 +24,6 @@ from recipes.serializers import RecipeShortReadSerializer
 from .models import ShoppingCart, Subscribe, User
 from .serializers import SubscriptionSerializer
 
-MEASUREMENT_UNIT = 0
-AMOUNT = 1
-
 FILE_NAME = 'shopping_cart.txt'
 
 SUBSCRIBE_CANNOT_CREATE_TO_YOURSELF = 'Нельзя подписаться на самого себя!'
