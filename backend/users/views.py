@@ -1,4 +1,5 @@
 from django.db import IntegrityError
+from django.db.models import Sum
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
@@ -37,7 +38,7 @@ SUBSCRIBE_CANNOT_DELETE = (
 
 USER_NOT_FOUND = 'Пользователь не найден!'
 
-SHOPPING_CART_EMPTY = 'Список покупок пуст!'
+SHOPPING_CART_DOES_NOT_EXISTS = 'Список покупок не существует!'
 SHOPPING_CART_RECIPE_CANNOT_ADDED_TWICE = 'Рецепт уже добавлен!'
 SHOPPING_CART_RECIPE_CANNOT_DELETE = (
     'Нельзя удалить рецепт из списка покупок, которого нет'
@@ -116,6 +117,8 @@ class UserSubscribeViewSet(UserViewSet):
 
 
 class ShoppingCartViewSet(GenericViewSet):
+    NAME = 'ingredients__ingredient__name'
+    MEASUREMENT_UNIT = 'ingredients__ingredient__measurement_unit'
     permission_classes = (IsAuthenticated,)
     serializer_class = RecipeShortReadSerializer
     queryset = ShoppingCart.objects.all()
@@ -125,23 +128,19 @@ class ShoppingCartViewSet(GenericViewSet):
         recipes = (
             request.user.shopping_cart.recipes.prefetch_related('ingredients')
         )
-        ingredients = {}
-        for recipe in recipes:
-            for ingredient in recipe.ingredients.all():
-                if ingredient.pk not in ingredients:
-                    ingredients[ingredient.ingredient.name] = [
-                        ingredient.ingredient.measurement_unit,
-                        ingredient.amount
-                    ]
-                    continue
-                ingredients[ingredient.name][AMOUNT] += ingredient.amount
-        return ingredients
+        return (
+            recipes.order_by(self.NAME)
+            .values(self.NAME, self.MEASUREMENT_UNIT)
+            .annotate(total=Sum('ingredients__amount'))
+        )
 
     def generate_file(self, ingredients, file_path):
         with open(MEDIA_ROOT / FILE_NAME, 'w', encoding='utf-8') as file:
-            for name, data in ingredients.items():
+            for ingredient in ingredients:
                 file.write(
-                    f'{name} ({data[MEASUREMENT_UNIT]}) — {data[AMOUNT]}\r\n'
+                    f'{ingredient[self.NAME]}'
+                    f' ({ingredient[self.MEASUREMENT_UNIT]})'
+                    f' — {ingredient["total"]}\r\n'
                 )
 
     @action(detail=False)
@@ -150,7 +149,7 @@ class ShoppingCartViewSet(GenericViewSet):
             ingredients = self.generate_shopping_cart_data(request)
         except ShoppingCart.DoesNotExist:
             return Response(
-                {ERRORS_KEY: SHOPPING_CART_EMPTY},
+                {ERRORS_KEY: SHOPPING_CART_DOES_NOT_EXISTS},
                 status=HTTP_400_BAD_REQUEST
             )
         file_path = MEDIA_ROOT / FILE_NAME
