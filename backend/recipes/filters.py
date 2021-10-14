@@ -23,7 +23,9 @@ class IngredientSearchFilter(FilterSet):
             )
         )
         contain_queryset = (
-            queryset.filter(name__icontains=value).annotate(
+            queryset.filter(name__icontains=value).exclude(
+                pk__in=(ingredient.pk for ingredient in start_with_queryset)
+            ).annotate(
                 order=Value(1, IntegerField())
             )
         )
