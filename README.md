@@ -2,7 +2,7 @@
 Это сервис для публикаций и обмена рецептами.
 Авторизованные пользователи могут подписываться на понравившихся авторов, добавлять рецепты в избранное, в покупки, скачивать список покупок. Неавторизованным пользователям доступна регистрация, авторизация, просмотр рецептов других пользователей.
 
-![example workflow](https://github.com/Yan-Zhelanov/foodgram-react-project/actions/workflows/foodgram_workflow.yml/badge.svg)
+![example workflow](https://github.com/Yan-Zhelanov/foodgram-project-react/actions/workflows/foodgram_workflow.yaml/badge.svg)
 
 
 ## Стек технологий
