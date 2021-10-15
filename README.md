@@ -111,6 +111,10 @@ create_models('../data/ingredients.csv', Ingredient, True)
 Сайт доступен по ссылке:
 [http://foodgram.ddns.net/](http://foodgram.ddns.net/)
 
+#### Админ-панель
+Логин: `admin@gmail.com`
+Пароль: `eLfxYjQghJdtHrBfLvbYrB5548`
+
 ## Документация к API
 Чтобы открыть документацию локально, запустите сервер и перейдите по ссылке:
 [http://127.0.0.1/api/docs/](http://127.0.0.1/api/docs/)

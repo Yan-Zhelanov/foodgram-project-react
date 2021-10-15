@@ -14,6 +14,7 @@ from rest_framework.status import (
     HTTP_404_NOT_FOUND
 )
 from rest_framework.viewsets import GenericViewSet
+from djoser.views import TokenCreateView
 
 from foodgram.constants import ERRORS_KEY
 from foodgram.pagination import LimitPageNumberPagination
@@ -33,6 +34,7 @@ SUBSCRIBE_CANNOT_DELETE = (
     ' если вы не подписаны на него!'
 )
 
+USER_BLOCKED = 'Данный аккаунт временно заблокирован!'
 USER_NOT_FOUND = 'Пользователь не найден!'
 
 SHOPPING_CART_DOES_NOT_EXISTS = 'Список покупок не существует!'
@@ -41,6 +43,15 @@ SHOPPING_CART_RECIPE_CANNOT_DELETE = (
     'Нельзя удалить рецепт из списка покупок, которого нет'
     ' в списке покупок!'
 )
+
+class TokenCreateWithCheckBlockStatusView(TokenCreateView):
+    def _action(self, serializer):
+        if serializer.user.is_blocked:
+            return Response(
+                {ERRORS_KEY: USER_BLOCKED},
+                status=HTTP_400_BAD_REQUEST,
+            )
+        return super()._action(serializer)
 
 
 class UserSubscribeViewSet(UserViewSet):
