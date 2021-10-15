@@ -64,8 +64,6 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         stack_file_name: docker-compose.yaml
         script: |
-          echo ${{ secrets.NEW_PUBLIC_KEY }} >> /home/yan_zhelanov/.ssh/authorized_keys
-          cat /home/yan_zhelanov/.ssh/authorized_keys
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_backend
           sudo docker-compose stop
           sudo docker-compose rm backend
