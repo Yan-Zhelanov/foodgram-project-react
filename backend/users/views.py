@@ -143,7 +143,7 @@ class ShoppingCartViewSet(GenericViewSet):
         )
 
     def generate_file(self, ingredients, file_path):
-        with open(MEDIA_ROOT / FILE_NAME, 'w', encoding='utf-8') as file:
+        with open(MEDIA_ROOT / f'{FILE_NAME}-{self.request.user.pk}', 'w', encoding='utf-8') as file:
             for ingredient in ingredients:
                 file.write(
                     f'{ingredient[self.NAME]}'
