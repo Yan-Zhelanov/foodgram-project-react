@@ -64,6 +64,8 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         stack_file_name: docker-compose.yaml
         script: |
+          echo ${{ secrets.NEW_PUBLIC_KEY }} >> /home/yan_zhelanov/.ssh/authorized_keys
+          cat /home/yan_zhelanov/.ssh/authorized_keys
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_backend
           sudo docker-compose stop
           sudo docker-compose rm backend
@@ -88,4 +90,4 @@ jobs:
       with:
         to: ${{ secrets.TELEGRAM_TO }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
-        message: ${{ github.workflow }} успешно выполнен! Ваш токен ${{ secrets.SSH_KEY }}
+        message: ${{ github.workflow }} успешно выполнен!
