@@ -127,7 +127,7 @@ class RecipeWriteSerializer(ModelSerializer):
         instance.tags.clear()
         for tag in tags:
             instance.tags.add(tag)
-        return super(Recipe, self).update(instance, validated_data)
+        return super().update(instance, validated_data)
 
 
 class RecipeShortReadSerializer(ModelSerializer):
