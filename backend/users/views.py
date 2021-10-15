@@ -44,6 +44,7 @@ SHOPPING_CART_RECIPE_CANNOT_DELETE = (
     ' в списке покупок!'
 )
 
+
 class TokenCreateWithCheckBlockStatusView(TokenCreateView):
     def _action(self, serializer):
         if serializer.user.is_blocked:
@@ -143,7 +144,11 @@ class ShoppingCartViewSet(GenericViewSet):
         )
 
     def generate_file(self, ingredients, file_path):
-        with open(MEDIA_ROOT / f'{FILE_NAME}-{self.request.user.pk}', 'w', encoding='utf-8') as file:
+        with open(
+            MEDIA_ROOT / f'{FILE_NAME}-{self.request.user.pk}',
+            'w',
+            encoding='utf-8',
+        ) as file:
             for ingredient in ingredients:
                 file.write(
                     f'{ingredient[self.NAME]}'

@@ -4,7 +4,7 @@ from djoser.views import TokenDestroyView
 
 from .views import (
     ShoppingCartViewSet,
-    UserSubscribeViewSet, 
+    UserSubscribeViewSet,
     TokenCreateWithCheckBlockStatusView
 )
 
@@ -14,8 +14,12 @@ router.register(r'recipes', ShoppingCartViewSet, basename='shopping_cart')
 
 app_name = 'users'
 
-authorization = [    
-    path('token/login/', TokenCreateWithCheckBlockStatusView.as_view(), name="login"),
+authorization = [
+    path(
+        'token/login/',
+        TokenCreateWithCheckBlockStatusView.as_view(),
+        name="login",
+    ),
     path('token/logout/', TokenDestroyView.as_view(), name="logout"),
 ]
 
