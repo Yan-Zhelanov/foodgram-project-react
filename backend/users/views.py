@@ -2,7 +2,7 @@ from django.db import IntegrityError
 from django.db.models import Sum
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
-from djoser.views import UserViewSet
+from djoser.views import TokenCreateView, UserViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -14,7 +14,6 @@ from rest_framework.status import (
     HTTP_404_NOT_FOUND
 )
 from rest_framework.viewsets import GenericViewSet
-from djoser.views import TokenCreateView
 
 from foodgram.constants import ERRORS_KEY
 from foodgram.pagination import LimitPageNumberPagination
