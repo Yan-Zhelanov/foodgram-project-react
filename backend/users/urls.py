@@ -1,4 +1,5 @@
 from django.urls import include, path
+
 from djoser.views import TokenDestroyView
 from rest_framework.routers import DefaultRouter
 
