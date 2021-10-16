@@ -1,10 +1,13 @@
 data.json
+ingredients.csv
+ingredients.json
 
 .vscode/
 media/
 media_backend/
 static/
 static_backend/
+infra1/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

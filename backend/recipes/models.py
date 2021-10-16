@@ -10,11 +10,16 @@ from django.db.models import (
     Model,
     PositiveIntegerField,
     SlugField,
-    TextField
+    TextField,
+    UniqueConstraint
 )
 from django.urls import reverse
 
 User = get_user_model()
+
+COOKING_TIME_MIN_ERROR = (
+    'Время приготовления не может быть меньше одной минуты!'
+)
 
 
 class Tag(Model):
@@ -51,7 +56,7 @@ class Recipe(Model):
     text = TextField('Описание')
     ingredients = ManyToManyField(
         'CountOfIngredient',
-        related_name='recipe',
+        related_name='recipes',
         verbose_name='Ингредиенты'
     )
     tags = ManyToManyField(
@@ -62,7 +67,7 @@ class Recipe(Model):
     image = ImageField('Картинка')
     cooking_time = PositiveIntegerField(
         'Время приготовления',
-        validators=(MinValueValidator(1),)
+        validators=(MinValueValidator(1, message=COOKING_TIME_MIN_ERROR),)
     )
     author = ForeignKey(
         User,
@@ -96,7 +101,12 @@ class CountOfIngredient(Model):
     class Meta:
         verbose_name = 'Количество ингредиента'
         verbose_name_plural = 'Количество ингредиентов'
-        unique_together = ('ingredient', 'amount',)
+        constraints = (
+            UniqueConstraint(
+                fields=('ingredient', 'amount',),
+                name='unique_ingredient_amount',
+            ),
+        )
 
     def __str__(self):
         return (
@@ -122,7 +132,12 @@ class Favorite(Model):
     class Meta:
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
-        unique_together = ('user', 'recipe',)
+        constraints = (
+            UniqueConstraint(
+                fields=('user', 'recipe',),
+                name='unique_user_recipe',
+            ),
+        )
 
     def __str__(self):
         return f'{self.user} -> {self.recipe}'

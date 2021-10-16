@@ -7,13 +7,23 @@ from rest_framework.serializers import (
     ListField,
     ModelSerializer,
     SerializerMethodField,
-    SlugRelatedField
+    SlugRelatedField,
+    ValidationError
 )
 
 from users.models import ShoppingCart
 from users.serializers import UserSerializer
 
-from .models import CountOfIngredient, Ingredient, Recipe, Tag
+from .models import (
+    COOKING_TIME_MIN_ERROR,
+    CountOfIngredient,
+    Ingredient,
+    Recipe,
+    Tag
+)
+
+TAGS_UNIQUE_ERROR = 'Теги не могут повторяться!'
+INGREDIENTS_UNIQUE_ERROR = 'Ингредиенты не могут повторяться!'
 
 
 class TagSerializer(ModelSerializer):
@@ -89,7 +99,7 @@ class RecipeWriteSerializer(ModelSerializer):
     tags = ListField(
         child=SlugRelatedField(
             slug_field='id',
-            queryset=Tag.objects.all()
+            queryset=Tag.objects.all(),
         ),
     )
     image = Base64ImageField()
@@ -100,34 +110,40 @@ class RecipeWriteSerializer(ModelSerializer):
             'ingredients', 'tags', 'image', 'name', 'text', 'cooking_time',
         )
 
-    def get_ingredients_and_tags(self, validated_data):
-        return validated_data.pop('ingredients'), validated_data.pop('tags')
+    def validate(self, attrs):
+        if attrs['cooking_time'] < 1:
+            raise ValidationError(COOKING_TIME_MIN_ERROR)
+        if len(attrs['tags']) > len(set(attrs['tags'])):
+            raise ValidationError(TAGS_UNIQUE_ERROR)
+        id_ingredients = [
+            ingredient['id'] for ingredient in attrs['ingredients']
+        ]
+        if len(id_ingredients) > len(set(id_ingredients)):
+            raise ValidationError(INGREDIENTS_UNIQUE_ERROR)
+        return attrs
 
-    def create(self, validated_data):
-        ingredients, tags = self.get_ingredients_and_tags(validated_data)
-        recipe = Recipe.objects.create(**validated_data)
-        for ingredient in ingredients:
-            count_of_ingredient, _ = CountOfIngredient.objects.get_or_create(
-                ingredient=get_object_or_404(Ingredient, pk=ingredient['id']),
-                amount=ingredient['amount'],
-            )
-            recipe.ingredients.add(count_of_ingredient)
-        for tag in tags:
-            recipe.tags.add(tag)
-        return recipe
-
-    def update(self, instance, validated_data):
-        ingredients, tags = self.get_ingredients_and_tags(validated_data)
-        instance.ingredients.clear()
+    def add_ingredients_and_tags(self, instance, validated_data):
+        ingredients, tags = (
+            validated_data.pop('ingredients'), validated_data.pop('tags')
+        )
         for ingredient in ingredients:
             count_of_ingredient, _ = CountOfIngredient.objects.get_or_create(
                 ingredient=get_object_or_404(Ingredient, pk=ingredient['id']),
                 amount=ingredient['amount'],
             )
             instance.ingredients.add(count_of_ingredient)
-        instance.tags.clear()
         for tag in tags:
             instance.tags.add(tag)
+        return instance
+
+    def create(self, validated_data):
+        recipe = Recipe.objects.create(**validated_data)
+        return self.add_ingredients_and_tags(recipe, validated_data)
+
+    def update(self, instance, validated_data):
+        instance.ingredients.clear()
+        instance.tags.clear()
+        instance = self.add_ingredients_and_tags(instance, validated_data)
         return super().update(instance, validated_data)
 
 
