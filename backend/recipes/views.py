@@ -3,7 +3,6 @@ from django.shortcuts import get_object_or_404
 
 from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework.decorators import action
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -15,6 +14,7 @@ from rest_framework.status import (
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
 from foodgram.constants import ERRORS_KEY
+from foodgram.mixins import ListRetriveViewSet
 from foodgram.pagination import LimitPageNumberPagination
 from foodgram.permissions import IsAuthorOrAdminOrReadOnly
 
@@ -30,10 +30,6 @@ from .serializers import (
 
 FAVORITE_ALREADY_EXISTS = 'Вы уже подписаны!'
 FAVORITE_DONT_EXIST = 'Подписки не существует!'
-
-
-class ListRetriveViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
-    pass
 
 
 class TagViewSet(ListRetriveViewSet):
@@ -64,23 +60,20 @@ class RecipeViewSet(ModelViewSet):
         return RecipeWriteSerializer
 
     def perform_create(self, serializer):
-        return serializer.save(author=self.request.user)
+        serializer.save(author=self.request.user)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        saved = self.perform_create(serializer)
+        self.perform_create(serializer)
         serializer = RecipeReadSerializer(
-            instance=saved,
+            instance=serializer.instance,
             context={'request': self.request}
         )
         headers = self.get_success_headers(serializer.data)
         return Response(
             serializer.data, status=HTTP_201_CREATED, headers=headers
         )
-
-    def perform_update(self, serializer):
-        return serializer.save()
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
@@ -89,9 +82,9 @@ class RecipeViewSet(ModelViewSet):
             instance, data=request.data, partial=partial
         )
         serializer.is_valid(raise_exception=True)
-        saved = self.perform_update(serializer)
+        self.perform_update(serializer)
         serializer = RecipeReadSerializer(
-            instance=saved,
+            instance=serializer.instance,
             context={'request': self.request},
         )
         return Response(
