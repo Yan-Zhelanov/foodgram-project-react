@@ -11,9 +11,6 @@ from rest_framework.serializers import (
     ValidationError
 )
 
-from users.serializers import UserSerializer
-from users.models import ShoppingCart
-
 from recipes.models import (
     COOKING_TIME_MIN_ERROR,
     CountOfIngredient,
@@ -21,6 +18,8 @@ from recipes.models import (
     Recipe,
     Tag
 )
+from users.models import ShoppingCart
+from users.serializers import UserSerializer
 
 TAGS_UNIQUE_ERROR = 'Теги не могут повторяться!'
 INGREDIENTS_UNIQUE_ERROR = 'Ингредиенты не могут повторяться!'
