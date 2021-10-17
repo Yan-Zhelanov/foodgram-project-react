@@ -20,7 +20,7 @@ from foodgram.constants import ERRORS_KEY
 from foodgram.pagination import LimitPageNumberPagination
 from foodgram.settings import MEDIA_ROOT
 from recipes.models import Recipe
-from recipes.serializers import RecipeShortReadSerializer
+from recipes.serializers.nested import RecipeShortReadSerializer
 
 from .models import ShoppingCart, Subscribe, User
 from .serializers import SubscriptionSerializer

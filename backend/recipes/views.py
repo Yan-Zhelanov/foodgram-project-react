@@ -20,13 +20,13 @@ from foodgram.permissions import IsAuthorOrAdminOrReadOnly
 
 from .filters import IngredientSearchFilter, RecipeFilter
 from .models import Favorite, Ingredient, Recipe, Tag
-from .serializers import (
+from .serializers.common import (
     IngredientSerializer,
     RecipeReadSerializer,
-    RecipeShortReadSerializer,
     RecipeWriteSerializer,
     TagSerializer
 )
+from .serializers.nested import RecipeShortReadSerializer
 
 FAVORITE_ALREADY_EXISTS = 'Вы уже подписаны!'
 FAVORITE_DONT_EXIST = 'Подписки не существует!'

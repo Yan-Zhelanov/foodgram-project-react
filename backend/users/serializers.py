@@ -2,6 +2,8 @@ from django.contrib.auth.hashers import make_password
 
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
+from recipes.serializers.nested import RecipeShortReadSerializer
+
 from .models import User
 
 
@@ -33,7 +35,6 @@ class UserSerializer(ModelSerializer):
 
 
 class SubscriptionSerializer(UserSerializer):
-    from recipes.serializers import RecipeShortReadSerializer
     recipes = RecipeShortReadSerializer(many=True)
     recipes_count = SerializerMethodField()
 

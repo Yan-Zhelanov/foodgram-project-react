@@ -11,10 +11,10 @@ from rest_framework.serializers import (
     ValidationError
 )
 
-from users.models import ShoppingCart
 from users.serializers import UserSerializer
+from users.models import ShoppingCart
 
-from .models import (
+from recipes.models import (
     COOKING_TIME_MIN_ERROR,
     CountOfIngredient,
     Ingredient,
@@ -145,9 +145,3 @@ class RecipeWriteSerializer(ModelSerializer):
         instance.tags.clear()
         instance = self.add_ingredients_and_tags(instance, validated_data)
         return super().update(instance, validated_data)
-
-
-class RecipeShortReadSerializer(ModelSerializer):
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time',)

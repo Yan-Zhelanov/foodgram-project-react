@@ -7,20 +7,21 @@ from django.db.models import (
     ForeignKey,
     ManyToManyField,
     Model,
-    OneToOneField
+    OneToOneField,
+    UniqueConstraint
 )
 
 from .managers import UserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    email = EmailField(max_length=254, unique=True)
-    username = CharField(max_length=150)
-    first_name = CharField(max_length=150)
-    last_name = CharField(max_length=150)
-    password = CharField(max_length=150)
-    is_superuser = BooleanField(default=False)
-    is_blocked = BooleanField(default=False)
+    email = EmailField('Почта', max_length=254, unique=True)
+    username = CharField('Никнейм', max_length=150)
+    first_name = CharField('Имя', max_length=150)
+    last_name = CharField('Фамилия', max_length=150)
+    password = CharField('Пароль', max_length=150)
+    is_superuser = BooleanField('Администратор', default=False)
+    is_blocked = BooleanField('Заблокирован', default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
@@ -56,7 +57,12 @@ class Subscribe(Model):
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
-        unique_together = ('user', 'author',)
+        constraints = (
+            UniqueConstraint(
+                fields=('user', 'author',),
+                name='unique_subscribe',
+            ),
+        )
 
     def __str__(self):
         return f'{self.user} -> {self.author}'
@@ -65,6 +71,7 @@ class Subscribe(Model):
 class ShoppingCart(Model):
     user = OneToOneField(
         User,
+        unique=True,
         on_delete=CASCADE,
         related_name='shopping_cart',
         verbose_name='Пользователь',

@@ -17,7 +17,7 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, username, password, **extra_fields):
         extra_fields.setdefault('is_superuser', True)
 
-        if extra_fields.get('is_superuser') is not True:
+        if not extra_fields.get('is_superuser'):
             raise ValueError(
                 'Суперпользователь должен иметь is_superuser=True!'
             )
