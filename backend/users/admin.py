@@ -1,5 +1,6 @@
 from django.contrib.admin import ModelAdmin, display, register
 from django.contrib.auth.admin import UserAdmin
+from django.db.models import Count, Sum
 
 from foodgram.constants import EMPTY
 
@@ -60,7 +61,7 @@ class ShoppingCartAdmin(ModelAdmin):
 
     @display(description='Количество ингредиентов')
     def count_ingredients(self, obj):
-        return sum(
-            recipe.ingredients.count()
-            for recipe in obj.recipes.prefetch_related('ingredients')
+        return (
+            obj.recipes.all().annotate(count_ingredients=Count('ingredients'))
+            .aggregate(total=Sum('count_ingredients'))['total']
         )

@@ -54,7 +54,7 @@ class CountOfIngredientAdmin(ModelAdmin):
 
     @display(description='Количество ссылок в рецептах')
     def get_recipes_count(self, obj):
-        return obj.recipe.count()
+        return obj.recipes.count()
 
 
 @register(Favorite)
