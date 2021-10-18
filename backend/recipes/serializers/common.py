@@ -1,5 +1,4 @@
 from django.shortcuts import get_object_or_404
-
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework.serializers import (
     CharField,
@@ -11,6 +10,7 @@ from rest_framework.serializers import (
     ValidationError
 )
 
+from foodgram.constants import COOKING_TIME_MIN_VALUE, INGREDIENT_MIN_AMOUNT
 from recipes.models import (
     COOKING_TIME_MIN_ERROR,
     CountOfIngredient,
@@ -23,6 +23,9 @@ from users.serializers import UserSerializer
 
 TAGS_UNIQUE_ERROR = 'Теги не могут повторяться!'
 INGREDIENTS_UNIQUE_ERROR = 'Ингредиенты не могут повторяться!'
+INGREDIENT_MIN_AMOUNT_ERROR = (
+    'Количество ингредиента с id: {id} — не может быть меньше {min_value}!'
+)
 
 
 class TagSerializer(ModelSerializer):
@@ -110,13 +113,20 @@ class RecipeWriteSerializer(ModelSerializer):
         )
 
     def validate(self, attrs):
-        if attrs['cooking_time'] < 1:
+        if attrs['cooking_time'] < COOKING_TIME_MIN_VALUE:
             raise ValidationError(COOKING_TIME_MIN_ERROR)
         if len(attrs['tags']) > len(set(attrs['tags'])):
             raise ValidationError(TAGS_UNIQUE_ERROR)
-        id_ingredients = [
-            ingredient['id'] for ingredient in attrs['ingredients']
-        ]
+        id_ingredients = []
+        for ingredient in attrs['ingredients']:
+            if ingredient['amount'] < INGREDIENT_MIN_AMOUNT:
+                raise ValidationError(
+                    INGREDIENT_MIN_AMOUNT_ERROR.format(
+                        id=ingredient['id'],
+                        min_value=INGREDIENT_MIN_AMOUNT,
+                    )
+                )
+            id_ingredients.append(ingredient['id'])
         if len(id_ingredients) > len(set(id_ingredients)):
             raise ValidationError(INGREDIENTS_UNIQUE_ERROR)
         return attrs

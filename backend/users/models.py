@@ -10,8 +10,15 @@ from django.db.models import (
     OneToOneField,
     UniqueConstraint
 )
+from django.db.models.signals import m2m_changed
+from django.db.utils import IntegrityError
+from django.dispatch import receiver
 
 from .managers import UserManager
+
+SHOPPING_CART_RECIPE_ALREADY_EXISTS_ERROR = (
+    'Данный рецепт уже есть в вашем списке покупок!'
+)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -88,3 +95,14 @@ class ShoppingCart(Model):
 
     def __str__(self):
         return f'{self.user}'
+
+
+@receiver(m2m_changed, sender=ShoppingCart.recipes.through)
+def verify_uniqueness(sender, **kwargs):
+    shopping_cart = kwargs.get('instance')
+    action = kwargs.get('action')
+    recipes = kwargs.get('pk_set')
+    if action == 'pre_add':
+        for recipe in recipes:
+            if shopping_cart.recipes.filter(pk__in=(recipe.pk,)).exists():
+                raise IntegrityError(SHOPPING_CART_RECIPE_ALREADY_EXISTS_ERROR)

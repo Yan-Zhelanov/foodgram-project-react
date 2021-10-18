@@ -15,10 +15,15 @@ from django.db.models import (
 )
 from django.urls import reverse
 
+from foodgram.constants import COOKING_TIME_MIN_VALUE, INGREDIENT_MIN_AMOUNT
+
 User = get_user_model()
 
 COOKING_TIME_MIN_ERROR = (
     'Время приготовления не может быть меньше одной минуты!'
+)
+INGREDIENT_MIN_AMOUNT_ERROR = (
+    'Количество ингредиентов не может быть меньше {min_value}!'
 )
 
 
@@ -67,7 +72,10 @@ class Recipe(Model):
     image = ImageField('Картинка')
     cooking_time = PositiveIntegerField(
         'Время приготовления',
-        validators=(MinValueValidator(1, message=COOKING_TIME_MIN_ERROR),)
+        validators=(MinValueValidator(
+            COOKING_TIME_MIN_VALUE,
+            message=COOKING_TIME_MIN_ERROR,
+        ),)
     )
     author = ForeignKey(
         User,
@@ -96,7 +104,15 @@ class CountOfIngredient(Model):
         related_name='count_in_recipes',
         verbose_name='Ингредиент',
     )
-    amount = PositiveIntegerField('Количество')
+    amount = PositiveIntegerField(
+        'Количество',
+        validators=(MinValueValidator(
+            INGREDIENT_MIN_AMOUNT,
+            message=INGREDIENT_MIN_AMOUNT_ERROR.format(
+                min_value=INGREDIENT_MIN_AMOUNT
+            )
+        ),)
+    )
 
     class Meta:
         verbose_name = 'Количество ингредиента'

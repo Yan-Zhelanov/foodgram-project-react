@@ -2,7 +2,6 @@ from django.db import IntegrityError
 from django.db.models import Sum
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
-
 from djoser.views import TokenCreateView, UserViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -20,7 +19,6 @@ from foodgram.constants import ERRORS_KEY
 from foodgram.pagination import LimitPageNumberPagination
 from recipes.models import Recipe
 from recipes.serializers.nested import RecipeShortReadSerializer
-
 from .models import ShoppingCart, Subscribe, User
 from .serializers import SubscriptionSerializer
 
