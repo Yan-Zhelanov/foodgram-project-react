@@ -10,9 +10,6 @@ from django.db.models import (
     OneToOneField,
     UniqueConstraint
 )
-from django.db.models.signals import m2m_changed
-from django.db.utils import IntegrityError
-from django.dispatch import receiver
 
 from .managers import UserManager
 
