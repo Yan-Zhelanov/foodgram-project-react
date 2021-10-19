@@ -78,7 +78,6 @@ class Subscribe(Model):
 class ShoppingCart(Model):
     user = OneToOneField(
         User,
-        unique=True,
         on_delete=CASCADE,
         related_name='shopping_cart',
         verbose_name='Пользователь',
@@ -95,14 +94,3 @@ class ShoppingCart(Model):
 
     def __str__(self):
         return f'{self.user}'
-
-
-@receiver(m2m_changed, sender=ShoppingCart.recipes.through)
-def verify_uniqueness(sender, **kwargs):
-    shopping_cart = kwargs.get('instance')
-    action = kwargs.get('action')
-    recipes = kwargs.get('pk_set')
-    if action == 'pre_add':
-        for recipe in recipes:
-            if shopping_cart.recipes.filter(pk__in=(recipe.pk,)).exists():
-                raise IntegrityError(SHOPPING_CART_RECIPE_ALREADY_EXISTS_ERROR)
