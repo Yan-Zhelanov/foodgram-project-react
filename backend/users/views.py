@@ -1,8 +1,7 @@
 from django.db import IntegrityError
 from django.db.models import Sum
-from django.http import FileResponse, Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
-
 from djoser.views import TokenCreateView, UserViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -18,10 +17,8 @@ from rest_framework.viewsets import GenericViewSet
 
 from foodgram.constants import ERRORS_KEY
 from foodgram.pagination import LimitPageNumberPagination
-from foodgram.settings import MEDIA_ROOT
 from recipes.models import Recipe
-from recipes.serializers import RecipeShortReadSerializer
-
+from recipes.serializers.nested import RecipeShortReadSerializer
 from .models import ShoppingCart, Subscribe, User
 from .serializers import SubscriptionSerializer
 
@@ -66,9 +63,7 @@ class UserSubscribeViewSet(UserViewSet):
     @action(detail=False, permission_classes=(IsAuthenticated,))
     def subscriptions(self, request):
         self.get_serializer
-        queryset = [
-            subscribe.author for subscribe in request.user.subscriber.all()
-        ]
+        queryset = User.objects.filter(subscribing__user=request.user)
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_subscribtion_serializer(page, many=True)
@@ -143,18 +138,15 @@ class ShoppingCartViewSet(GenericViewSet):
             .annotate(total=Sum('ingredients__amount'))
         )
 
-    def generate_file(self, ingredients, file_path):
-        with open(
-            MEDIA_ROOT / f'{FILE_NAME}-{self.request.user.pk}',
-            'w',
-            encoding='utf-8',
-        ) as file:
-            for ingredient in ingredients:
-                file.write(
-                    f'{ingredient[self.NAME]}'
-                    f' ({ingredient[self.MEASUREMENT_UNIT]})'
-                    f' — {ingredient["total"]}\r\n'
-                )
+    def generate_ingredients_content(self, ingredients):
+        content = ''
+        for ingredient in ingredients:
+            content += (
+                f'{ingredient[self.NAME]}'
+                f' ({ingredient[self.MEASUREMENT_UNIT]})'
+                f' — {ingredient["total"]}\r\n'
+            )
+        return content
 
     @action(detail=False)
     def download_shopping_cart(self, request):
@@ -165,9 +157,12 @@ class ShoppingCartViewSet(GenericViewSet):
                 {ERRORS_KEY: SHOPPING_CART_DOES_NOT_EXISTS},
                 status=HTTP_400_BAD_REQUEST
             )
-        file_path = MEDIA_ROOT / FILE_NAME
-        self.generate_file(ingredients, file_path)
-        return FileResponse(open(file_path, 'rb'))
+        content = self.generate_ingredients_content(ingredients)
+        response = HttpResponse(
+            content, content_type='text/plain,charset=utf8'
+        )
+        response['Content-Disposition'] = f'attachment; filename={FILE_NAME}'
+        return response
 
     def add_to_shopping_cart(self, request, recipe, shopping_cart):
         if shopping_cart.recipes.filter(pk__in=(recipe.pk,)).exists():

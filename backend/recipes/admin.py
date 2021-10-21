@@ -1,7 +1,6 @@
 from django.contrib.admin import ModelAdmin, display, register
 
 from foodgram.constants import EMPTY
-
 from .models import CountOfIngredient, Favorite, Ingredient, Recipe, Tag
 
 
@@ -54,7 +53,7 @@ class CountOfIngredientAdmin(ModelAdmin):
 
     @display(description='Количество ссылок в рецептах')
     def get_recipes_count(self, obj):
-        return obj.recipe.count()
+        return obj.recipes.count()
 
 
 @register(Favorite)

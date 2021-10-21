@@ -1,6 +1,5 @@
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
-
 from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
@@ -11,22 +10,21 @@ from rest_framework.status import (
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST
 )
-from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from rest_framework.viewsets import ModelViewSet
 
 from foodgram.constants import ERRORS_KEY
 from foodgram.mixins import ListRetriveViewSet
 from foodgram.pagination import LimitPageNumberPagination
 from foodgram.permissions import IsAuthorOrAdminOrReadOnly
-
 from .filters import IngredientSearchFilter, RecipeFilter
 from .models import Favorite, Ingredient, Recipe, Tag
-from .serializers import (
+from .serializers.common import (
     IngredientSerializer,
     RecipeReadSerializer,
-    RecipeShortReadSerializer,
     RecipeWriteSerializer,
     TagSerializer
 )
+from .serializers.nested import RecipeShortReadSerializer
 
 FAVORITE_ALREADY_EXISTS = 'Вы уже подписаны!'
 FAVORITE_DONT_EXIST = 'Подписки не существует!'
@@ -91,10 +89,6 @@ class RecipeViewSet(ModelViewSet):
             serializer.data, status=HTTP_200_OK
         )
 
-
-class FavoriteViewSet(GenericViewSet):
-    permission_classes = (IsAuthenticated,)
-
     def add_to_favorite(self, request, recipe):
         try:
             Favorite.objects.create(user=request.user, recipe=recipe)
@@ -119,7 +113,11 @@ class FavoriteViewSet(GenericViewSet):
         favorite.delete()
         return Response(status=HTTP_204_NO_CONTENT)
 
-    @action(methods=('get', 'delete',), detail=True)
+    @action(
+        methods=('get', 'delete',),
+        detail=True,
+        permission_classes=(IsAuthenticated,)
+    )
     def favorite(self, request, pk=None):
         recipe = get_object_or_404(Recipe, pk=pk)
         if request.method == 'GET':

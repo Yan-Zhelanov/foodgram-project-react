@@ -1,5 +1,4 @@
 from django.db.models import IntegerField, Value
-
 from django_filters.rest_framework import FilterSet
 from django_filters.rest_framework import (
     AllValuesMultipleFilter,
@@ -8,7 +7,6 @@ from django_filters.rest_framework import (
 )
 
 from users.models import ShoppingCart
-
 from .models import Ingredient, Recipe
 
 
