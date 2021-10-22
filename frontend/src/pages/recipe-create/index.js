@@ -67,7 +67,7 @@ const RecipeCreate = ({ onEdit }) => {
         <meta name="description" content="Продуктовый помощник - Создание рецепта" />
         <meta property="og:title" content="Создание рецепта" />
       </MetaTags>
-      <Title title='Создание рецепта 1' />
+      <Title title='Создание рецепта' />
       <Form
         className={styles.form}
         onSubmit={e => {
@@ -95,7 +95,7 @@ const RecipeCreate = ({ onEdit }) => {
             }
             const errors = JSON.stringify(err)
             if (errors) {
-              alert(errors.match(/\["(.*?)\"]/))
+              alert(errors.match(/\["(.*?)\"]/)[1])
             }
           })
         }}
