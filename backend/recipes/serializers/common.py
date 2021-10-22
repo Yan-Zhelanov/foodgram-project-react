@@ -22,10 +22,13 @@ from users.models import ShoppingCart
 from users.serializers import UserSerializer
 
 TAGS_UNIQUE_ERROR = 'Теги не могут повторяться!'
+TAGS_EMPTY_ERROR = 'Рецепт не может быть без тегов!'
 INGREDIENTS_UNIQUE_ERROR = 'Ингредиенты не могут повторяться!'
+INGREDIENTS_EMPTY_ERROR = 'Без ингредиентов рецепта не бывает!'
 INGREDIENT_MIN_AMOUNT_ERROR = (
-    'Количество ингредиента с id: {id} — не может быть меньше {min_value}!'
+    'Количество ингредиента не может быть меньше {min_value}!'
 )
+INGREDIENT_DOES_NOT_EXIST = 'Такого ингредиента не существует!'
 
 
 class TagSerializer(ModelSerializer):
@@ -47,7 +50,17 @@ class RecipeIngredientWriteSerializer(ModelSerializer):
         extra_kwargs = {
             'id': {
                 'read_only': False,
+                'error_messages': {
+                    'does_not_exist': INGREDIENT_DOES_NOT_EXIST,
+                }
             },
+            'amount': {
+                'error_messages': {
+                    'min_value': INGREDIENT_MIN_AMOUNT_ERROR.format(
+                        min_value=INGREDIENT_MIN_AMOUNT
+                    ),
+                }
+            }
         }
 
 
@@ -111,17 +124,23 @@ class RecipeWriteSerializer(ModelSerializer):
         fields = (
             'ingredients', 'tags', 'image', 'name', 'text', 'cooking_time',
         )
-
-    def validate_cooking_time(self, value):
-        if value < 1:
-            raise ValidationError(COOKING_TIME_MIN_ERROR)
-        return value
+        extra_kwargs = {
+            'cooking_time': {
+                'error_messages': {
+                    'min_value': COOKING_TIME_MIN_ERROR,
+                }
+            }
+        }
 
     def validate(self, attrs):
         if attrs['cooking_time'] < COOKING_TIME_MIN_VALUE:
             raise ValidationError(COOKING_TIME_MIN_ERROR)
+        if len(attrs['tags']) == 0:
+            raise ValidationError(TAGS_EMPTY_ERROR)
         if len(attrs['tags']) > len(set(attrs['tags'])):
             raise ValidationError(TAGS_UNIQUE_ERROR)
+        if len(attrs['ingredients']) == 0:
+            raise ValidationError(INGREDIENTS_EMPTY_ERROR)
         id_ingredients = []
         for ingredient in attrs['ingredients']:
             if ingredient['amount'] < INGREDIENT_MIN_AMOUNT:
