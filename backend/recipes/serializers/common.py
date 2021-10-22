@@ -112,6 +112,11 @@ class RecipeWriteSerializer(ModelSerializer):
             'ingredients', 'tags', 'image', 'name', 'text', 'cooking_time',
         )
 
+    def validate_cooking_time(self, value):
+        if value < 1:
+            raise ValidationError(COOKING_TIME_MIN_ERROR)
+        return value
+
     def validate(self, attrs):
         if attrs['cooking_time'] < COOKING_TIME_MIN_VALUE:
             raise ValidationError(COOKING_TIME_MIN_ERROR)
