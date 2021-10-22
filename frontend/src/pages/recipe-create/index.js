@@ -67,7 +67,7 @@ const RecipeCreate = ({ onEdit }) => {
         <meta name="description" content="Продуктовый помощник - Создание рецепта" />
         <meta property="og:title" content="Создание рецепта" />
       </MetaTags>
-      <Title title='Создание рецепта' />
+      <Title title='Создание рецепта 1' />
       <Form
         className={styles.form}
         onSubmit={e => {
