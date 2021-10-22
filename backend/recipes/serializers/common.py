@@ -146,7 +146,6 @@ class RecipeWriteSerializer(ModelSerializer):
             if ingredient['amount'] < INGREDIENT_MIN_AMOUNT:
                 raise ValidationError(
                     INGREDIENT_MIN_AMOUNT_ERROR.format(
-                        id=ingredient['id'],
                         min_value=INGREDIENT_MIN_AMOUNT,
                     )
                 )

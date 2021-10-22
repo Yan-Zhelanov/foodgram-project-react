@@ -93,9 +93,9 @@ const RecipeCreate = ({ onEdit }) => {
             if (non_field_errors) {
               alert(non_field_errors.join(', '))
             }
-            const errors = Object.values(err)
+            const errors = JSON.stringify(err)
             if (errors) {
-              alert(errors.join(', '))
+              alert(errors.match(/\["(.*?)\"]/))
             }
           })
         }}
