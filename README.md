@@ -96,13 +96,6 @@ from scripts.import_data import create_models
 create_models('../data/ingredients.csv', Ingredient, True)
 ```
 
-## Сайт
-Сайт доступен по ссылке:
-[http://foodgram.ddns.net/](http://foodgram.ddns.net/)
-
 ## Документация к API
 Чтобы открыть документацию локально, запустите сервер и перейдите по ссылке:
 [http://127.0.0.1/api/docs/](http://127.0.0.1/api/docs/)
-
-Так же документация доступна на сервере:
-[http://foodgram.ddns.net/api/docs/](http://foodgram.ddns.net/api/docs/)
